@@ -1,12 +1,11 @@
 import AddToHomeScreenPrompt from "@/components/add-to-homescreen-prompt";
+import Hero from "@/components/home";
 
 export default function Home() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-        <AddToHomeScreenPrompt />
-      </h1>
+      <Hero />
+      <AddToHomeScreenPrompt />
     </>
   );
 }
