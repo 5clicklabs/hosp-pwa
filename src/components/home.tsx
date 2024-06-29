@@ -1,59 +1,14 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { ClipboardPlus, LucideIcon, Ambulance, PhoneCall } from "lucide-react";
-
-interface FrequentlyUsedCard {
-  logo: LucideIcon;
-  color: string;
-  heading: string;
-  subheading: string;
-  directive: () => void;
-}
-
-function Card(card: FrequentlyUsedCard) {
-  return (
-    <Flex
-      bg="#FCFCFC"
-      height="250px"
-      width="32%"
-      borderRadius="18px"
-      p={6}
-      direction="column"
-      justify="space-between"
-      className="shadow-2xl"
-      border="0.5px"
-      borderColor="gray.400"
-      onClick={() => card.directive()}
-    >
-      <Flex
-        height="fit-content"
-        width="fit-content"
-        borderRadius={99}
-        bg={card.color}
-        p={2}
-        align="center"
-        justify="center"
-      >
-        <card.logo color="white" className="h-6 w-6" />
-      </Flex>
-
-      <Flex direction="column">
-        <Text fontSize="18px" color={card.color}>
-          {card.heading}
-        </Text>
-        <Text fontSize="18px" color="#323641">
-          {card.subheading}
-        </Text>
-      </Flex>
-    </Flex>
-  );
-}
+import { FrequentlyUsedCard } from "@/utils/types";
+import { Flex, Text } from "@chakra-ui/react";
+import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
+import Card from "./core/frequent-card";
 
 export default function Hero() {
   return (
     <Flex direction="column">
+      <MostFrequentlyAsked />
       <Text>Hi,</Text>
       <Text variant="subheading">What can I help you with?</Text>
-      <MostFrequentlyAsked />
     </Flex>
   );
 }
@@ -90,12 +45,14 @@ const options: Array<FrequentlyUsedCard> = [
 
 function MostFrequentlyAsked() {
   return (
-    <>
-      <Text variant="subheading" className="mt-10">
-        Most Frequently Asked
-      </Text>
+    <div className="w-full mb-10">
+      <Text variant="subheading">Most Frequently Asked</Text>
 
-      <Flex align="center" justify="space-evenly">
+      <Flex
+        style={{ overflowX: "scroll" }}
+        align="center"
+        justify={{ base: "flex-start", lg: "space-evenly" }}
+      >
         {options.map((item, index) => (
           <Card
             color={item.color}
@@ -107,6 +64,6 @@ function MostFrequentlyAsked() {
           />
         ))}
       </Flex>
-    </>
+    </div>
   );
 }

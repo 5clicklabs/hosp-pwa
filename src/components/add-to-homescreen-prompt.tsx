@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Button } from "./ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -9,7 +10,6 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-// Extend the WindowEventMap interface
 declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
@@ -18,17 +18,30 @@ declare global {
 
 const AddToHomeScreenPrompt: React.FC = () => {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isStandalone, setIsStandalone] = useState<boolean | undefined>(
+    undefined
+  );
 
   useEffect(() => {
-    const handler = (e: BeforeInstallPromptEvent) => {
-      e.preventDefault();
-      setPrompt(e);
+    const checkStandalone = () => {
+      const isInStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone;
+      setIsStandalone(isInStandalone);
     };
 
+    checkStandalone();
     window.addEventListener("beforeinstallprompt", handler);
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
   }, []);
+
+  const handler = (e: BeforeInstallPromptEvent) => {
+    e.preventDefault();
+    setPrompt(e);
+  };
 
   const handleAddToHomeScreen = () => {
     if (prompt) {
@@ -44,10 +57,14 @@ const AddToHomeScreenPrompt: React.FC = () => {
     }
   };
 
+  if (isStandalone || !prompt) {
+    return null;
+  }
+
   return (
-    prompt && (
-      <button onClick={handleAddToHomeScreen}>Add to Home Screen</button>
-    )
+    <Button onClick={handleAddToHomeScreen} className="fixed bottom-5">
+      Add the Manipal App to the Home Screen
+    </Button>
   );
 };
 
