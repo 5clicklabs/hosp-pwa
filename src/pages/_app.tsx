@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import Layout from "./layout";
 import { RecoilRoot } from "recoil";
 import { chakraTheme } from "../lib/chakra.config";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -11,6 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <RecoilRoot>
         <Layout>
           <Component {...pageProps} />
+          <Toaster />
         </Layout>
       </RecoilRoot>
     </ChakraProvider>
