@@ -51,7 +51,7 @@ function MostFrequentlyAsked() {
       <Flex
         style={{ overflowX: "scroll" }}
         align="center"
-        py={2}
+        p={4}
         justify={{ base: "flex-start", lg: "space-evenly" }}
       >
         {options.map((item, index) => (

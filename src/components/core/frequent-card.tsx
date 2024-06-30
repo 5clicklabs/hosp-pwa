@@ -1,12 +1,26 @@
 import { FrequentlyUsedCard } from "@/lib/types";
 import { Flex, Text } from "@chakra-ui/react";
+import React from "react";
 
 export default function Card(card: FrequentlyUsedCard) {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isClicked, setIsClicked] = React.useState(false);
+
+  const handleHover = () => {
+    setIsHovered(!isHovered);
+  };
+
+  const handleClick = () => {
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 150);
+    card.directive();
+  };
+
   return (
     <Flex
       bg="#FCFCFC"
-      height="250px"
-      minW={{ base: "250px", lg: "30%" }}
+      height="200px"
+      minW={{ base: "200px", lg: "30%" }}
       maxWidth="90%"
       borderRadius="12px"
       p={6}
@@ -14,9 +28,15 @@ export default function Card(card: FrequentlyUsedCard) {
       justify="space-between"
       boxShadow="0 4px 8px rgba(0, 0, 0, 0.1)"
       border="1px solid #E0E0E0"
-      onClick={() => card.directive()}
       cursor="pointer"
       mx={2}
+      transform={
+        isClicked ? "scale(0.9)" : isHovered ? "scale(1.1)" : "scale(1)"
+      }
+      transition="transform 0.15s ease-in-out"
+      onClick={handleClick}
+      onMouseEnter={handleHover}
+      onMouseLeave={handleHover}
     >
       <Flex
         height="fit-content"
