@@ -7,3 +7,10 @@ export interface FrequentlyUsedCard {
   subheading: string;
   directive: () => void;
 }
+
+export interface Message {
+  id: number;
+  text: string;
+  timestamp: string;
+  sender: "user" | "assistant";
+}
