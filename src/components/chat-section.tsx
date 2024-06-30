@@ -1,8 +1,9 @@
 import { Button, Flex, Textarea } from "@chakra-ui/react";
+import { AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AnimatePresence, motion } from "framer-motion";
+import ChatBubble from "./core/chat-bubble";
 
 export default function Chat() {
   const [message, setMessage] = useState("");
@@ -13,7 +14,7 @@ export default function Chat() {
       timestamp: string;
     }[]
   >([]);
-  const [selectedMessage, setSelectedMessage] = useState<number | null>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -47,10 +48,6 @@ export default function Chat() {
     setMessage("");
   };
 
-  const handleMessageClick = (id: number) => {
-    setSelectedMessage(selectedMessage === id ? null : id);
-  };
-
   return (
     <Flex
       className="rounded-2xl items-end"
@@ -61,28 +58,14 @@ export default function Chat() {
       direction="column"
       p={2}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {messages.map((msg) => (
-          <motion.div
+          <ChatBubble
+            id={msg.id}
+            text={msg.text}
+            timestamp={msg.timestamp}
             key={msg.id}
-            layout="position"
-            className="z-10 my-2 max-w-[250px] break-words rounded-2xl bg-gray-200 dark:bg-gray-800 cursor-pointer"
-            layoutId={`container-${msg.id}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => handleMessageClick(msg.id)}
-          >
-            <div className="px-3 py-2 text-[15px] leading-[15px] text-gray-900 dark:text-gray-100">
-              {msg.text}
-            </div>
-            {selectedMessage === msg.id && (
-              <div className="px-3 py-1 text-[12px] leading-[12px] text-gray-500 dark:text-gray-400">
-                {msg.timestamp}
-              </div>
-            )}
-          </motion.div>
+          />
         ))}
       </AnimatePresence>
 
