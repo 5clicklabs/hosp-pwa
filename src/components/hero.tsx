@@ -35,8 +35,8 @@ const options: Array<FrequentlyUsedCard> = [
 
 export default function Hero() {
   return (
-    <Flex direction="column" flexShrink={0} p={4}>
-      <MostFrequentlyAsked />
+    <Flex direction="column" p={4}>
+      {/* <MostFrequentlyAsked /> */}
       <Text>Hi,</Text>
       <Text variant="subheading">What can I help you with?</Text>
     </Flex>
@@ -51,7 +51,7 @@ function MostFrequentlyAsked() {
       <Flex
         style={{ overflowX: "scroll" }}
         align="center"
-        p={4}
+        py={4}
         justify={{ base: "flex-start", lg: "space-evenly" }}
       >
         {options.map((item, index) => (

@@ -29,6 +29,9 @@ export default function Chat() {
       toast.error("This message is too long, please type a shorter message.");
       return;
     }
+
+    if (message === "") return;
+
     setMessage("");
   };
 
@@ -37,7 +40,7 @@ export default function Chat() {
       className="rounded-2xl"
       bg="#F5F5F5"
       flexGrow={1}
-      overflow="auto"
+      // overflow="auto"
       justify="flex-end"
       direction="column"
       p={2}
@@ -54,7 +57,10 @@ export default function Chat() {
           <Textarea
             ref={textareaRef}
             placeholder="Ask me a question..."
-            _placeholder={{ color: "gray.400", fontSize: "14px" }}
+            _placeholder={{
+              color: "gray.400",
+              fontSize: "14px",
+            }}
             _focusVisible={{ outline: "none", boxShadow: "none" }}
             borderRadius={50}
             border="none"

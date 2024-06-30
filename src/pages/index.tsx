@@ -4,7 +4,11 @@ import { Flex } from "@chakra-ui/react";
 
 export default function Home() {
   return (
-    <Flex direction="column" height="100vh" overflow={"hidden"}>
+    <Flex
+      direction="column"
+      className="h-[calc(100vh-100px)]"
+      // overflow={"hidden"}
+    >
       <Hero />
       <Chat />
     </Flex>
