@@ -11,6 +11,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
+import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
 
 export default function HamburgerMenu() {
   const [menuIsOpen, setMenuIsOpen] = useRecoilState(menuAtom);
@@ -25,17 +26,11 @@ export default function HamburgerMenu() {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Create your account</DrawerHeader>
 
-          <DrawerBody>
-            <Input placeholder="Type here..." />
-          </DrawerBody>
+          <DrawerBody></DrawerBody>
 
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue">Save</Button>
+          <DrawerFooter className="w-full">
+            <AddToHomeScreenPrompt />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

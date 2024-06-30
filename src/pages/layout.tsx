@@ -26,7 +26,12 @@ function Header() {
 
   return (
     <>
-      <Flex direction="row" align="center" justify="space-between">
+      <Flex
+        className="h-16"
+        direction="row"
+        align="center"
+        justify="space-between"
+      >
         <Image w="200px" src="/assets/logo.webp" alt="Manipal Hospitals Logo" />
         <Menu
           className="h-8 w-8"

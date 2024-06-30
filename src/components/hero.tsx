@@ -1,17 +1,7 @@
-import { FrequentlyUsedCard } from "@/utils/types";
+import { FrequentlyUsedCard } from "@/lib/types";
 import { Flex, Text } from "@chakra-ui/react";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import Card from "./core/frequent-card";
-
-export default function Hero() {
-  return (
-    <Flex direction="column">
-      <MostFrequentlyAsked />
-      <Text>Hi,</Text>
-      <Text variant="subheading">What can I help you with?</Text>
-    </Flex>
-  );
-}
 
 const options: Array<FrequentlyUsedCard> = [
   {
@@ -43,14 +33,25 @@ const options: Array<FrequentlyUsedCard> = [
   },
 ];
 
+export default function Hero() {
+  return (
+    <Flex direction="column" flexShrink={0} p={4}>
+      <MostFrequentlyAsked />
+      <Text>Hi,</Text>
+      <Text variant="subheading">What can I help you with?</Text>
+    </Flex>
+  );
+}
+
 function MostFrequentlyAsked() {
   return (
-    <div className="w-full mb-10">
+    <div className="my-5">
       <Text variant="subheading">Most Frequently Asked</Text>
 
       <Flex
         style={{ overflowX: "scroll" }}
         align="center"
+        py={2}
         justify={{ base: "flex-start", lg: "space-evenly" }}
       >
         {options.map((item, index) => (

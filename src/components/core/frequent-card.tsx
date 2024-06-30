@@ -1,4 +1,4 @@
-import { FrequentlyUsedCard } from "@/utils/types";
+import { FrequentlyUsedCard } from "@/lib/types";
 import { Flex, Text } from "@chakra-ui/react";
 
 export default function Card(card: FrequentlyUsedCard) {
@@ -6,7 +6,7 @@ export default function Card(card: FrequentlyUsedCard) {
     <Flex
       bg="#FCFCFC"
       height="250px"
-      width="250px"
+      minW={{ base: "250px", lg: "30%" }}
       maxWidth="90%"
       borderRadius="12px"
       p={6}
@@ -26,7 +26,6 @@ export default function Card(card: FrequentlyUsedCard) {
         p={2}
         align="center"
         justify="center"
-        border="1px solid"
       >
         <card.logo color="white" className="h-6 w-6" />
       </Flex>

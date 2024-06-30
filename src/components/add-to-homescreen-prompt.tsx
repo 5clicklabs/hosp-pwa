@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
+import { Flex } from "@chakra-ui/react";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -62,9 +63,11 @@ const AddToHomeScreenPrompt: React.FC = () => {
   }
 
   return (
-    <Button onClick={handleAddToHomeScreen} className="fixed bottom-5">
-      Add the Manipal App to the Home Screen
-    </Button>
+    <Flex width="100%" align="center" justify="center">
+      <Button onClick={handleAddToHomeScreen}>
+        Add this App to your Home Screen
+      </Button>
+    </Flex>
   );
 };
 

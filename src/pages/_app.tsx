@@ -3,7 +3,7 @@ import "../../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "./layout";
 import { RecoilRoot } from "recoil";
-import { chakraTheme } from "../utils/chakra.config";
+import { chakraTheme } from "../lib/chakra.config";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
