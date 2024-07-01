@@ -5,10 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import ChatBubble from "./core/chat-bubble";
 import { Message } from "@/lib/types";
+import { useRecoilState } from "recoil";
+import messagesAtom from "@/atoms/messagesAtom";
 
 export default function Chat() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useRecoilState(messagesAtom);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);

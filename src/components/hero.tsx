@@ -1,42 +1,11 @@
-import { FrequentlyUsedCard } from "@/lib/types";
+import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { Flex, Text } from "@chakra-ui/react";
-import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import Card from "./core/frequent-card";
-
-const options: Array<FrequentlyUsedCard> = [
-  {
-    logo: ClipboardPlus,
-    color: "#FF6B04",
-    heading: "Access Lab Reports",
-    subheading: "Access reports",
-    directive: () => {
-      console.log("access lab is being called");
-    },
-  },
-  {
-    logo: Ambulance,
-    color: "#00B6F1",
-    heading: "Make Appointments",
-    subheading: "Book Appointments in seconds",
-    directive: () => {
-      console.log("ambulance was called");
-    },
-  },
-  {
-    logo: PhoneCall,
-    color: "#A51514",
-    heading: "Emergency",
-    subheading: "Call the nearest Manipal Hospital",
-    directive: () => {
-      console.log("phone call was called");
-    },
-  },
-];
 
 export default function Hero() {
   return (
     <Flex direction="column" p={4}>
-      {/* <MostFrequentlyAsked /> */}
+      <MostFrequentlyAsked />
       <Text>Hi,</Text>
       <Text variant="subheading">What can I help you with?</Text>
     </Flex>
@@ -44,6 +13,7 @@ export default function Hero() {
 }
 
 function MostFrequentlyAsked() {
+  const { options } = useFrequentlyAskedOperations();
   return (
     <div className="my-5">
       <Text variant="subheading">Most Frequently Asked</Text>

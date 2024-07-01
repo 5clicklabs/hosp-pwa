@@ -1,53 +1,20 @@
 import menuAtom from "@/atoms/menuAtom";
+import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
+import { FrequentlyUsedCard } from "@/lib/types";
 import {
-  Button,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
-  DrawerHeader,
   DrawerOverlay,
   Flex,
-  Input,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useRecoilState } from "recoil";
-import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
-import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
-import { FrequentlyUsedCard } from "@/lib/types";
 import React from "react";
-
-const options: Array<FrequentlyUsedCard> = [
-  {
-    logo: ClipboardPlus,
-    color: "#FF6B04",
-    heading: "Access Lab Reports",
-    subheading: "Access reports",
-    directive: () => {
-      console.log("access lab is being called");
-    },
-  },
-  {
-    logo: Ambulance,
-    color: "#00B6F1",
-    heading: "Make Appointments",
-    subheading: "Book Appointments in seconds",
-    directive: () => {
-      console.log("ambulance was called");
-    },
-  },
-  {
-    logo: PhoneCall,
-    color: "#A51514",
-    heading: "Emergency",
-    subheading: "Call the nearest Manipal Hospital",
-    directive: () => {
-      console.log("phone call was called");
-    },
-  },
-];
+import { useRecoilState } from "recoil";
+import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
 
 export default function HamburgerMenu() {
   const [menuIsOpen, setMenuIsOpen] = useRecoilState(menuAtom);
@@ -55,6 +22,8 @@ export default function HamburgerMenu() {
   const onClose = () => {
     setMenuIsOpen({ isOpen: false });
   };
+
+  const { options } = useFrequentlyAskedOperations();
 
   return (
     <>
@@ -111,7 +80,7 @@ function Row(card: FrequentlyUsedCard) {
       transition="transform 0.1s ease-in-out"
       onClick={handleClick}
     >
-      <card.logo className={`h-6 w-6 text-[${card.color}]`} />
+      <card.logo className={`h-6 w-6`} />
       <Flex direction="column">
         <Text
           textAlign="right"
