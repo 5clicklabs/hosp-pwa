@@ -1,7 +1,7 @@
-import { useRecoilState } from "recoil";
 import messagesAtom from "@/atoms/messagesAtom";
 import { FrequentlyUsedCard, Message } from "@/lib/types";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
+import { useRecoilState } from "recoil";
 
 export default function useFrequentlyAskedOperations() {
   const [messages, setMessages] = useRecoilState(messagesAtom);

@@ -1,12 +1,12 @@
-import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
+import messagesAtom from "@/atoms/messagesAtom";
+import { Message } from "@/lib/types";
+import { Button, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useRecoilState } from "recoil";
 import { toast } from "sonner";
 import ChatBubble from "./core/chat-bubble";
-import { Message } from "@/lib/types";
-import { useRecoilState } from "recoil";
-import messagesAtom from "@/atoms/messagesAtom";
 
 export default function Chat() {
   const [message, setMessage] = useState("");
