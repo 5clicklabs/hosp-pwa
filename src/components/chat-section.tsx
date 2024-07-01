@@ -122,6 +122,13 @@ export default function Chat() {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit(event as unknown as React.FormEvent);
+    }
+  };
+
   return (
     <Flex
       className="rounded-2xl items-end"
@@ -175,6 +182,7 @@ export default function Chat() {
             resize="none"
             value={message}
             onChange={handleChange}
+            onKeyDown={handleKeyPress}
             style={{
               overflow: "hidden",
               minHeight: "56px",
