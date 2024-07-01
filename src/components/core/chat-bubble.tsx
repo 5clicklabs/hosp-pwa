@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Spinner } from "@chakra-ui/react";
 
 export default function ChatBubble({
   id,
@@ -9,7 +10,7 @@ export default function ChatBubble({
   id: number;
   text: string;
   timestamp: string;
-  sender: "user" | "assistant";
+  sender: "user" | "assistant" | "system";
 }) {
   const isUser = sender === "user";
 
@@ -31,7 +32,9 @@ export default function ChatBubble({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="px-3 py-2 text-[15px] leading-[15px]">{text}</div>
+        <div className="px-3 py-2 text-[15px] leading-[15px]">
+          {sender === "system" ? <Spinner size="sm" /> : text}
+        </div>
         <div className="px-3 py-1 text-[12px] leading-[12px] text-gray-500">
           {timestamp}
         </div>

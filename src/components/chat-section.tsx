@@ -1,4 +1,4 @@
-import { Button, Flex, Textarea } from "@chakra-ui/react";
+import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -60,16 +60,24 @@ export default function Chat() {
     setMessage("");
     setIsFetching(true);
 
-    await fetchAIResponse(message, id);
+    const systemMessage: Message = {
+      id: id + 1,
+      text: "",
+      timestamp,
+      sender: "system",
+    };
+    setMessages((prevMessages) => [...prevMessages, systemMessage]);
+
+    await fetchAIResponse(message, id + 1);
     setIsFetching(false);
   };
 
   const fetchAIResponse = async (
     userMessage: string,
-    userMessageId: number
+    systemMessageId: number
   ): Promise<void> => {
     const timestamp = new Date().toLocaleString();
-    const id = userMessageId + 1;
+    const id = systemMessageId;
 
     try {
       const response = await fetch("/api/openai", {
@@ -85,14 +93,6 @@ export default function Chat() {
       let content = "";
       let done = false;
 
-      const assistantMessage: Message = {
-        id,
-        text: "",
-        timestamp,
-        sender: "assistant",
-      };
-      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-
       while (!done) {
         const { value, done: doneReading } = (await reader?.read()) ?? {
           value: new Uint8Array(),
@@ -104,7 +104,7 @@ export default function Chat() {
 
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
-            msg.id === id ? { ...msg, text: content } : msg
+            msg.id === id ? { ...msg, text: content, sender: "assistant" } : msg
           )
         );
       }
@@ -190,7 +190,11 @@ export default function Chat() {
             borderRadius={999}
             disabled={isFetching}
           >
-            <ArrowUp className="w-5 h-5 text-gray-600" />
+            {isFetching ? (
+              <Spinner size="sm" />
+            ) : (
+              <ArrowUp className="w-5 h-5 text-gray-600" />
+            )}
           </Button>
         </Flex>
       </form>
