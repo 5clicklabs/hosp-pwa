@@ -11,12 +11,19 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "20px";
     }
   }, []);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
@@ -119,12 +126,19 @@ export default function Chat() {
     <Flex
       className="rounded-2xl items-end"
       bg="#F5F5F5"
-      flexGrow={1}
+      height={{ base: "85%", "2xl": "95%" }}
       justify="flex-end"
       direction="column"
       p={2}
     >
-      <div className="flex flex-col w-full">
+      <Flex
+        height="95%"
+        width="100%"
+        direction="column"
+        overflowY="auto"
+        p={2}
+        mb={2}
+      >
         <AnimatePresence>
           {messages.map((msg) => (
             <ChatBubble
@@ -136,7 +150,8 @@ export default function Chat() {
             />
           ))}
         </AnimatePresence>
-      </div>
+        <div ref={messagesEndRef} />
+      </Flex>
 
       <form onSubmit={handleSubmit} className="w-full">
         <Flex
