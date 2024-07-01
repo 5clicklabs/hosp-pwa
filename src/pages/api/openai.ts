@@ -1,3 +1,4 @@
+import { MANIPAL_DEPARTMENTS } from "@/lib/departments";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 
@@ -27,10 +28,28 @@ export default async function handler(
   res.setHeader("Connection", "keep-alive");
   res.setHeader("Transfer-Encoding", "chunked");
 
+  const departmentsList = MANIPAL_DEPARTMENTS.join(", ");
+
+  const initialMessage = `
+  This is Manipal Hospital's website. If a prompt is not related to medicine or health, strictly state that it is out of context and you cannot provide information on that topic. Additionally, do not give medical advice or prescribe medicines. If medical advice is requested, inform the user to visit a doctor and suggest they book an appointment. 
+
+The available departments are: ${departmentsList}.
+
+For example, if the user says, "I'm coughing a lot, what do I do?" Respond with a short, to-the-point message like: "Please book an appointment with our General Medicine or Pulmonology department for your symptoms."`;
+
   try {
     const stream = await openai.chat.completions.create({
       model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        {
+          role: "system",
+          content: initialMessage,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
       stream: true,
     });
 
