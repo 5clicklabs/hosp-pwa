@@ -50,10 +50,7 @@ export default function Card(card: FrequentlyUsedCard) {
         {card.heading}
       </CText>
 
-      <CText
-        // fontSize={{ base: "14px", lg: "16px" }}
-        color="#323641"
-      >
+      <CText fontSize={{ base: "14px", lg: "16px" }} color="#323641">
         {card.subheading}
       </CText>
     </Flex>

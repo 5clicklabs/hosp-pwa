@@ -60,13 +60,13 @@ function Settings({ isOpen, onClose }: SettingsProps) {
   const [language, setLanguage] = useRecoilState(languageAtom);
 
   function increaseFontSize() {
-    if (fontSize.fontSize < 24) {
+    if (fontSize.fontSize < 20) {
       setFontSize((prev) => ({ fontSize: prev.fontSize + 1 }));
     }
   }
 
   function decreaseFontSize() {
-    if (fontSize.fontSize > 14 && fontSize.fontSize <= 24) {
+    if (fontSize.fontSize > 14 && fontSize.fontSize <= 20) {
       setFontSize((prev) => ({ fontSize: prev.fontSize - 1 }));
     }
   }

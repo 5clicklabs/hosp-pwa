@@ -3,9 +3,10 @@ import { languageAtom } from "@/atoms/utils";
 import { FrequentlyUsedCard, Message } from "@/lib/types";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { toast } from "sonner";
 
 export default function useFrequentlyAskedOperations() {
-  const [_, setMessages] = useRecoilState(messagesAtom);
+  const [messages, setMessages] = useRecoilState(messagesAtom);
   const useLS = useRecoilValue(languageAtom);
 
   const sendMessageToAI = async (text: string) => {
@@ -39,6 +40,10 @@ export default function useFrequentlyAskedOperations() {
         body: JSON.stringify({
           prompt: text,
           language: useLS.applicationLanguage,
+          conversationHistory: messages.map((msg) => ({
+            role: msg.sender === "user" ? "user" : "assistant",
+            content: msg.text,
+          })),
         }),
       });
 
@@ -63,6 +68,11 @@ export default function useFrequentlyAskedOperations() {
               : msg
           )
         );
+
+        if (content.includes("Appointment booked successfully")) {
+          toast.success("Appointment booked successfully!");
+          console.log("Appointment booked!");
+        }
       }
     } catch (error) {
       console.error(error);
@@ -115,7 +125,7 @@ export default function useFrequentlyAskedOperations() {
       subheading: "Call the nearest Manipal Hospital",
       directive: () => {
         console.log("Phone call was called");
-        getCurrentLocation();
+        // getCurrentLocation();
         sendMessageToAI("I have an emergency and need assistance.");
       },
     },
