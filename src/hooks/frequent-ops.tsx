@@ -4,7 +4,7 @@ import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import { useRecoilState } from "recoil";
 
 export default function useFrequentlyAskedOperations() {
-  const [messages, setMessages] = useRecoilState(messagesAtom);
+  const [_, setMessages] = useRecoilState(messagesAtom);
 
   const sendMessageToAI = async (text: string) => {
     const timestamp = new Date().toLocaleString();

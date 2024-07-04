@@ -1,5 +1,5 @@
 import messagesAtom from "@/atoms/messagesAtom";
-import { Message } from "@/lib/types";
+import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { Button, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
@@ -10,7 +10,8 @@ import ChatBubble from "./core/chat-bubble";
 
 export default function Chat() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useRecoilState(messagesAtom);
+  const [messages, _] = useRecoilState(messagesAtom);
+  const { sendMessageToAI } = useFrequentlyAskedOperations();
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -49,79 +50,11 @@ export default function Chat() {
       return;
     }
 
-    const timestamp = new Date().toLocaleString();
-    const id = new Date().getTime();
-    const userMessage: Message = {
-      id,
-      text: message,
-      timestamp,
-      sender: "user",
-    };
-
-    setMessages([...messages, userMessage]);
     setMessage("");
     setIsFetching(true);
 
-    const systemMessage: Message = {
-      id: id + 1,
-      text: "",
-      timestamp,
-      sender: "system",
-    };
-    setMessages((prevMessages) => [...prevMessages, systemMessage]);
-
-    await fetchAIResponse(message, id + 1);
+    await sendMessageToAI(message);
     setIsFetching(false);
-  };
-
-  const fetchAIResponse = async (
-    userMessage: string,
-    systemMessageId: number
-  ): Promise<void> => {
-    const timestamp = new Date().toLocaleString();
-    const id = systemMessageId;
-
-    try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: userMessage }),
-      });
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let content = "";
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = (await reader?.read()) ?? {
-          value: new Uint8Array(),
-          done: true,
-        };
-        done = doneReading;
-        const chunk = decoder.decode(value);
-        content += chunk;
-
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === id ? { ...msg, text: content, sender: "assistant" } : msg
-          )
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      const failedMessage: Message = {
-        id,
-        text: "Failed to fetch AI response.",
-        timestamp,
-        sender: "assistant",
-      };
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) => (msg.id === id ? failedMessage : msg))
-      );
-    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
