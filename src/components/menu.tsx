@@ -15,6 +15,7 @@ import React from "react";
 import { useRecoilState } from "recoil";
 import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
 import CText from "./core/ctext";
+import OpenAIStatus from "./status";
 
 export default function HamburgerMenu() {
   const [menuIsOpen, setMenuIsOpen] = useRecoilState(menuAtom);
@@ -33,7 +34,7 @@ export default function HamburgerMenu() {
           <DrawerCloseButton />
 
           <DrawerBody p={10}>
-            <CText
+            {/* <CText
               textAlign="left"
               fontSize={{ base: "16px", lg: "18px" }}
               fontWeight="bold"
@@ -45,11 +46,12 @@ export default function HamburgerMenu() {
               {options.map((item, index) => (
                 <Row key={index} {...item} />
               ))}
-            </Stack>
+            </Stack> */}
           </DrawerBody>
 
           <DrawerFooter className="w-full">
-            <AddToHomeScreenPrompt />
+            {/* <AddToHomeScreenPrompt /> */}
+            <OpenAIStatus />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

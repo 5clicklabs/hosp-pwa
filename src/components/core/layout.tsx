@@ -1,9 +1,15 @@
 import menuAtom from "@/atoms/menuAtom";
+import { fontSizeAtom, languageAtom, LANGUAGES } from "@/atoms/utils";
 import HamburgerMenu from "@/components/menu";
 import {
+  Button,
   Container,
   Flex,
   Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,27 +18,21 @@ import {
   ModalHeader,
   ModalOverlay,
   useDisclosure,
-  Button,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Menu,
 } from "@chakra-ui/react";
+import { FontSizeIcon } from "@radix-ui/react-icons";
 import {
-  ChevronDownIcon,
-  Languages,
-  Menu as Hamburger,
-  SettingsIcon,
   Check,
+  ChevronDownIcon,
+  Menu as Hamburger,
+  Languages,
   Minus,
   Plus,
+  SettingsIcon,
 } from "lucide-react";
 import React from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { fontSizeAtom, languageAtom, LANGUAGES } from "@/atoms/utils";
-import CText from "./ctext";
 import { Button as BlackButton } from "../ui/button";
-import { FontSizeIcon } from "@radix-ui/react-icons";
+import CText from "./ctext";
 
 interface Props {
   children: React.ReactNode;
@@ -49,8 +49,8 @@ export default function Layout({ children }: Props) {
       <Container className="space-y-4" p={3} maxW={"3xl"}>
         <Header />
         {children}
-        <HamburgerMenu />
       </Container>
+      <HamburgerMenu />
     </>
   );
 }
