@@ -1,6 +1,7 @@
 import { FrequentlyUsedCard } from "@/lib/types";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import React from "react";
+import CText from "./ctext";
 
 export default function Card(card: FrequentlyUsedCard) {
   const [isClicked, setIsClicked] = React.useState(false);
@@ -41,17 +42,20 @@ export default function Card(card: FrequentlyUsedCard) {
         <card.logo color="white" className="h-6 w-6" />
       </Flex>
 
-      <Text
-        fontSize={{ base: "16px", lg: "18px" }}
+      <CText
+        // fontSize={{ base: "16px", lg: "18px" }}
         color={card.color}
         fontWeight="bold"
       >
         {card.heading}
-      </Text>
+      </CText>
 
-      <Text fontSize={{ base: "14px", lg: "16px" }} color="#323641">
+      <CText
+        // fontSize={{ base: "14px", lg: "16px" }}
+        color="#323641"
+      >
         {card.subheading}
-      </Text>
+      </CText>
     </Flex>
   );
 }

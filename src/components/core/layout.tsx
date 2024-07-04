@@ -1,12 +1,46 @@
 import menuAtom from "@/atoms/menuAtom";
-import { Container, Flex, Image } from "@chakra-ui/react";
-import React from "react";
-import { useSetRecoilState } from "recoil";
-import { Menu } from "lucide-react";
 import HamburgerMenu from "@/components/menu";
+import {
+  Container,
+  Flex,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Button,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Menu,
+} from "@chakra-ui/react";
+import {
+  ChevronDownIcon,
+  Languages,
+  Menu as Hamburger,
+  SettingsIcon,
+  Check,
+  Minus,
+  Plus,
+} from "lucide-react";
+import React from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { fontSizeAtom, languageAtom, LANGUAGES } from "@/atoms/utils";
+import CText from "./ctext";
+import { Button as BlackButton } from "../ui/button";
+import { FontSizeIcon } from "@radix-ui/react-icons";
 
 interface Props {
   children: React.ReactNode;
+}
+
+interface SettingsProps {
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function Layout({ children }: Props) {
@@ -21,8 +55,90 @@ export default function Layout({ children }: Props) {
   );
 }
 
+function Settings({ isOpen, onClose }: SettingsProps) {
+  const [fontSize, setFontSize] = useRecoilState(fontSizeAtom);
+  const [language, setLanguage] = useRecoilState(languageAtom);
+
+  function increaseFontSize() {
+    if (fontSize.fontSize < 24) {
+      setFontSize((prev) => ({ fontSize: prev.fontSize + 1 }));
+    }
+  }
+
+  function decreaseFontSize() {
+    if (fontSize.fontSize > 14 && fontSize.fontSize <= 24) {
+      setFontSize((prev) => ({ fontSize: prev.fontSize - 1 }));
+    }
+  }
+
+  return (
+    <>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent width="90%">
+          <ModalHeader>
+            <CText align="center">Settings</CText>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody className="space-y-3">
+            <Flex align="center" className="space-x-3">
+              <Languages className="h-6 w-6" />
+              <CText>Toggle Language:</CText>
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                  {language.applicationLanguage}
+                </MenuButton>
+                <MenuList>
+                  {LANGUAGES.map((lang) => (
+                    <MenuItem
+                      key={lang}
+                      onClick={() => setLanguage({ applicationLanguage: lang })}
+                    >
+                      <Flex align="center" className="space-x-3">
+                        {lang === language.applicationLanguage && (
+                          <Check className="h-6 w-6" />
+                        )}
+                        <CText>{lang}</CText>
+                      </Flex>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </Flex>
+
+            <Flex align="center" className="space-x-3">
+              <Flex align="center" className="space-x-3">
+                <FontSizeIcon className="h-6 w-6" />
+                <CText>Change Font Size:</CText>
+              </Flex>
+
+              <Flex align="center" justify="space-evenly" className="space-x-4">
+                <BlackButton size={"sm"} onClick={decreaseFontSize}>
+                  <Minus className="h-6 w-6" />
+                </BlackButton>
+
+                <CText>{fontSize.fontSize}</CText>
+
+                <BlackButton size={"sm"} onClick={increaseFontSize}>
+                  <Plus className="h-6 w-6" />
+                </BlackButton>
+              </Flex>
+            </Flex>
+          </ModalBody>
+
+          <ModalFooter>
+            {/* <Button onClick={onClose}>Close</Button>
+            <Button variant="ghost">Secondary Action</Button> */}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
 function Header() {
   const setIsMenuOpen = useSetRecoilState(menuAtom);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
@@ -33,11 +149,15 @@ function Header() {
         justify="space-between"
       >
         <Image w="200px" src="/assets/logo.webp" alt="Manipal Hospitals Logo" />
-        <Menu
-          className="h-8 w-8"
-          onClick={() => setIsMenuOpen({ isOpen: true })}
-        />
+        <Flex align="center" className="space-x-3">
+          <SettingsIcon className="h-8 w-8" onClick={onOpen} />
+          <Hamburger
+            className="h-8 w-8"
+            onClick={() => setIsMenuOpen({ isOpen: true })}
+          />
+        </Flex>
       </Flex>
+      <Settings isOpen={isOpen} onClose={onClose} />
     </>
   );
 }

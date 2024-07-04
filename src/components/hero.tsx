@@ -1,16 +1,17 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import Card from "./core/frequent-card";
 import { Switch } from "./ui/switch";
 import React from "react";
 import { motion } from "framer-motion";
+import CText from "./core/ctext";
 
 export default function Hero() {
   return (
     <Flex direction="column" p={4}>
       <MostFrequentlyAsked />
-      <Text>Hi,</Text>
-      <Text variant="subheading">What can I help you with?</Text>
+      <CText>Hi,</CText>
+      <CText variant="subheading">What can I help you with?</CText>
     </Flex>
   );
 }
@@ -22,7 +23,7 @@ function MostFrequentlyAsked() {
   return (
     <div className="my-5">
       <Flex justify="space-between" align="center">
-        <Text variant="subheading">Most Frequently Asked</Text>
+        <CText variant="subheading">Most Frequently Asked</CText>
         <Switch
           checked={isChecked}
           onCheckedChange={() => setIsChecked(!isChecked)}

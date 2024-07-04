@@ -10,11 +10,11 @@ import {
   DrawerOverlay,
   Flex,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useRecoilState } from "recoil";
 import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
+import CText from "./core/ctext";
 
 export default function HamburgerMenu() {
   const [menuIsOpen, setMenuIsOpen] = useRecoilState(menuAtom);
@@ -33,14 +33,14 @@ export default function HamburgerMenu() {
           <DrawerCloseButton />
 
           <DrawerBody p={10}>
-            <Text
+            <CText
               textAlign="left"
               fontSize={{ base: "16px", lg: "18px" }}
               fontWeight="bold"
               mb={3}
             >
               Most Frequently Asked
-            </Text>
+            </CText>
             <Stack spacing={2}>
               {options.map((item, index) => (
                 <Row key={index} {...item} />
@@ -82,22 +82,22 @@ function Row(card: FrequentlyUsedCard) {
     >
       <card.logo className={`h-6 w-6`} />
       <Flex direction="column">
-        <Text
+        <CText
           textAlign="right"
           fontSize={{ base: "16px", lg: "18px" }}
           fontWeight="bold"
           color={card.color}
         >
           {card.heading}
-        </Text>
+        </CText>
 
-        <Text
+        <CText
           textAlign="right"
           fontSize={{ base: "14px", lg: "16px" }}
           color="#323641"
         >
           {card.subheading}
-        </Text>
+        </CText>
       </Flex>
     </Flex>
   );

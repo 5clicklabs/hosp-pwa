@@ -1,10 +1,12 @@
 import messagesAtom from "@/atoms/messagesAtom";
+import { languageAtom } from "@/atoms/utils";
 import { FrequentlyUsedCard, Message } from "@/lib/types";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 export default function useFrequentlyAskedOperations() {
   const [_, setMessages] = useRecoilState(messagesAtom);
+  const useLS = useRecoilValue(languageAtom);
 
   const sendMessageToAI = async (text: string) => {
     const timestamp = new Date().toLocaleString();
@@ -29,12 +31,15 @@ export default function useFrequentlyAskedOperations() {
     setMessages((prevMessages) => [...prevMessages, systemMessage]);
 
     try {
-      const response = await fetch("/api/openai", {
+      const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: text }),
+        body: JSON.stringify({
+          prompt: text,
+          language: useLS.applicationLanguage,
+        }),
       });
 
       const reader = response.body?.getReader();
@@ -100,7 +105,6 @@ export default function useFrequentlyAskedOperations() {
       heading: "Make Appointments",
       subheading: "Book Appointments in seconds",
       directive: () => {
-        console.log("Make appointments was called");
         sendMessageToAI("I would like to make an appointment.");
       },
     },

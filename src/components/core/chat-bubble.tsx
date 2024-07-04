@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Spinner } from "@chakra-ui/react";
+import { useRecoilValue } from "recoil";
+import { fontSizeAtom } from "@/atoms/utils";
 
 export default function ChatBubble({
   id,
@@ -13,6 +15,7 @@ export default function ChatBubble({
   sender: "user" | "assistant" | "system";
 }) {
   const isUser = sender === "user";
+  const useFS = useRecoilValue(fontSizeAtom);
 
   return (
     <div
@@ -32,10 +35,14 @@ export default function ChatBubble({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="px-3 py-2 text-[15px] leading-[15px]">
+        <p
+          className={`px-3 py-2 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px]`}
+        >
           {sender === "system" ? <Spinner size="sm" /> : text}
-        </div>
-        <div className="px-3 py-1 text-[12px] leading-[12px] text-gray-500">
+        </p>
+        <div
+          className={`px-3 py-1 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px] text-gray-500`}
+        >
           {timestamp}
         </div>
       </motion.div>
