@@ -148,7 +148,7 @@ function Header() {
         align="center"
         justify="space-between"
       >
-        <Image w="200px" src="/assets/logo.webp" alt="Manipal Hospitals Logo" />
+        <Image w="200px" src="/assets/logo.webp" alt="Insert Hospitals Logo" />
         <Flex align="center" className="space-x-3">
           <SettingsIcon className="h-8 w-8" onClick={onOpen} />
           <Hamburger
