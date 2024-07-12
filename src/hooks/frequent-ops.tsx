@@ -9,6 +9,45 @@ export default function useFrequentlyAskedOperations() {
   const [messages, setMessages] = useRecoilState(messagesAtom);
   const useLS = useRecoilValue(languageAtom);
 
+  async function sendMessageToGPT(
+    message: string,
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: message,
+          language: useLS.applicationLanguage,
+          conversationHistory: messages.map((msg) => ({
+            role: msg.sender === "user" ? "user" : "assistant",
+            content: msg.text,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        onChunk(chunk);
+      }
+    } catch (error) {
+      console.error("Error calling GPT API:", error);
+      throw error;
+    }
+  }
+
   const sendMessageToAI = async (text: string): Promise<void> => {
     const timestamp = new Date().toLocaleString();
     const id = new Date().getTime();
@@ -100,16 +139,6 @@ export default function useFrequentlyAskedOperations() {
     }
   };
 
-  function getCurrentLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log("POSITION: ", position);
-      });
-    } else {
-      console.log("Geolocation is not supported by this browser.");
-    }
-  }
-
   const options: Array<FrequentlyUsedCard> = [
     {
       logo: ClipboardPlus,
@@ -146,5 +175,6 @@ export default function useFrequentlyAskedOperations() {
   return {
     options,
     sendMessageToAI,
+    sendMessageToGPT,
   };
 }

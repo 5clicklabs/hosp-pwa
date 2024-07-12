@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { Flex } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { Message } from "../lib/types";
-import WelcomeOptions from "./chat/welcome-options";
 import InputForm from "./chat/input-form";
-import MessageList, { simulateAIResponse } from "./chat/message-list";
+import MessageList from "./chat/message-list";
+import WelcomeOptions from "./chat/welcome-options";
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -11,6 +13,8 @@ const Chat: React.FC = () => {
   const [showInputForm, setShowInputForm] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { sendMessageToGPT } = useFrequentlyAskedOperations();
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -61,9 +65,33 @@ const Chat: React.FC = () => {
     setShowInputForm(false);
     setIsFetching(true);
 
-    const aiResponse = await simulateAIResponse(message);
-    setMessages((prevMessages) => [...prevMessages, aiResponse]);
-    setIsFetching(false);
+    const aiMessageId = Date.now() + 1;
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: aiMessageId,
+        text: "",
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      },
+    ]);
+
+    try {
+      await sendMessageToGPT(message, (chunk) => {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === aiMessageId ? { ...msg, text: msg.text + chunk } : msg
+          )
+        );
+      });
+    } catch (error) {
+      console.error("Error getting GPT response:", error);
+      toast.error(
+        "Sorry, there was an error processing your request. Please try again."
+      );
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   return (
