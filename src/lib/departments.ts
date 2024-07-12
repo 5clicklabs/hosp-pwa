@@ -79,7 +79,7 @@ export const MANIPAL_DEPARTMENTS = [
   "Podiatric Surgery",
   "Psychiatry",
   "Psychology",
-  "Pulmonology (Respiratory and Sleep Medicine)",
+  "Pulmonology",
   "Radiology",
   "Radiotherapy (Oncology Radiation)",
   "Rehabilitation Medicine",

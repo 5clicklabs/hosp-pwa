@@ -1,6 +1,7 @@
 import React from "react";
-import { Button, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import CText from "../core/ctext";
+import { Button } from "../ui/button";
 
 interface WelcomeOptionsProps {
   onOptionSelect: (option: string) => void;
@@ -8,28 +9,13 @@ interface WelcomeOptionsProps {
 
 const WelcomeOptions: React.FC<WelcomeOptionsProps> = ({ onOptionSelect }) => (
   <VStack align="stretch" spacing={2} mt={4}>
-    <Button
-      size="md"
-      bg="#1f2937"
-      color="white"
-      onClick={() => onOptionSelect("Book an appointment")}
-    >
+    <Button onClick={() => onOptionSelect("Book an appointment")}>
       <CText>Book an appointment</CText>
     </Button>
-    <Button
-      size="md"
-      bg="#1f2937"
-      color="white"
-      onClick={() => onOptionSelect("Get Lab Reports")}
-    >
+    <Button onClick={() => onOptionSelect("Get Lab Reports")}>
       <CText>Get Lab Reports</CText>
     </Button>
-    <Button
-      size="md"
-      bg="#1f2937"
-      color="white"
-      onClick={() => onOptionSelect("General Inquiry")}
-    >
+    <Button onClick={() => onOptionSelect("General Inquiry")}>
       <CText>General Inquiry</CText>
     </Button>
   </VStack>

@@ -1,20 +1,22 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Flex } from "@chakra-ui/react";
+import { Flex, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Message } from "../lib/types";
 import InputForm from "./chat/input-form";
 import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
+import CText from "./core/ctext";
+import { Button } from "./ui/button";
 
 const Chat: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { sendMessageToGPT, messages, setMessages } =
+    useFrequentlyAskedOperations();
   const [showOptions, setShowOptions] = useState(false);
   const [showInputForm, setShowInputForm] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [departments, setDepartments] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const { sendMessageToGPT } = useFrequentlyAskedOperations();
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -77,13 +79,26 @@ const Chat: React.FC = () => {
     ]);
 
     try {
-      await sendMessageToGPT(message, (chunk) => {
+      const extractedDepartments = await sendMessageToGPT(message, (chunk) => {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === aiMessageId ? { ...msg, text: msg.text + chunk } : msg
           )
         );
       });
+
+      if (extractedDepartments.length > 0) {
+        setDepartments(extractedDepartments);
+      } else {
+        const clarificationMessage: Message = {
+          id: Date.now(),
+          text: "I'm sorry, I couldn't determine a specific department based on your input. Could you please provide more details about your symptoms or the type of medical assistance you need?",
+          sender: "assistant",
+          timestamp: new Date().toLocaleString(),
+        };
+        setMessages((prev) => [...prev, clarificationMessage]);
+        setShowInputForm(true);
+      }
     } catch (error) {
       console.error("Error getting GPT response:", error);
       toast.error(
@@ -92,6 +107,17 @@ const Chat: React.FC = () => {
     } finally {
       setIsFetching(false);
     }
+  };
+
+  const handleDepartmentSelect = (department: string) => {
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `Selected department: ${department}`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setDepartments([]);
   };
 
   return (
@@ -113,6 +139,15 @@ const Chat: React.FC = () => {
       >
         <MessageList messages={messages} />
         {showOptions && <WelcomeOptions onOptionSelect={handleOptionSelect} />}
+        {departments.length > 0 && (
+          <VStack align="stretch" spacing={2} mt={4}>
+            {departments.map((dept) => (
+              <Button key={dept} onClick={() => handleDepartmentSelect(dept)}>
+                <CText>Proceed with {dept}</CText>
+              </Button>
+            ))}
+          </VStack>
+        )}
         <div ref={messagesEndRef} />
       </Flex>
       {showInputForm && (
