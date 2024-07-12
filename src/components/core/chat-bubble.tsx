@@ -28,7 +28,7 @@ export default function ChatBubble({
       <motion.div
         key={id}
         layout="position"
-        className={`z-10 my-2 max-w-[250px] break-words rounded-2xl ${
+        className={`z-10 my-2 max-w-[50%] break-words rounded-2xl ${
           isUser ? "bg-gray-200 text-gray-900" : "bg-gray-800 text-gray-100"
         }`}
         layoutId={`container-${id}`}

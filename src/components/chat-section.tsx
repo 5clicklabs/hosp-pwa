@@ -53,6 +53,7 @@ const Chat: React.FC = () => {
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
       setShowInputForm(true);
     }
+
     // Handle other options here
   };
 
@@ -112,7 +113,7 @@ const Chat: React.FC = () => {
   const handleDepartmentSelect = (department: string) => {
     const userMessage: Message = {
       id: Date.now(),
-      text: `Selected department: ${department}`,
+      text: `${department}`,
       sender: "user",
       timestamp: new Date().toLocaleString(),
     };

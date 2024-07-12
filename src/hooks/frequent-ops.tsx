@@ -45,11 +45,14 @@ export default function useFrequentlyAskedOperations() {
         onChunk(chunk);
       }
 
-      console.log("Full response:", fullResponse);
       const departments = extractDepartments(fullResponse);
-      console.log("Extracted departments:", departments);
 
-      return departments;
+      const filteredDepartments = departments.filter(
+        (dept) => dept !== "Based"
+      );
+
+      // return departments;
+      return filteredDepartments;
     } catch (error) {
       console.error("Error calling GPT API:", error);
       throw error;
@@ -98,8 +101,6 @@ export default function useFrequentlyAskedOperations() {
 }
 
 const extractDepartments = (text: string): string[] => {
-  console.log("Extracting departments from:", text);
-
   // Method 1: Look for "department(s):" followed by a list
   const departmentRegex = /department[s]?:?\s*([\w\s,]+)(?=\.|\?|$)/i;
   const match = text.match(departmentRegex);
@@ -109,7 +110,7 @@ const extractDepartments = (text: string): string[] => {
       .map((dept) => dept.trim())
       .filter(Boolean)
       .filter((dept) => dept.length > 1); // Filter out single-character departments
-    console.log("Extracted using regex:", extracted);
+
     if (extracted.length > 0) return extracted;
   }
 
@@ -118,7 +119,6 @@ const extractDepartments = (text: string): string[] => {
     text.toLowerCase().includes(dept.toLowerCase())
   );
   if (mentionedDepartments.length > 0) {
-    console.log("Extracted using predefined list:", mentionedDepartments);
     return mentionedDepartments;
   }
 
@@ -127,14 +127,9 @@ const extractDepartments = (text: string): string[] => {
   const potentialDepartments = words.filter(
     (word) => word.length > 1 && word[0] === word[0].toUpperCase()
   );
-  console.log(
-    "Potential departments from capitalized words:",
-    potentialDepartments
-  );
 
   // If we still couldn't find any departments, return a subset of predefined departments
   if (potentialDepartments.length === 0) {
-    console.log("No departments found, using default subset");
     return PREDEFINED_DEPARTMENTS.slice(0, 3); // Return first 3 as a fallback
   }
 
