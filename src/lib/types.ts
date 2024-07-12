@@ -14,3 +14,10 @@ export interface Message {
   timestamp: string;
   sender: "user" | "assistant" | "system";
 }
+
+export interface UserDetails {
+  name: string;
+  email: string;
+  phone: string;
+  dob: string;
+}

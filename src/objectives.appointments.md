@@ -2,9 +2,6 @@
 
 ## TO BE DONE
 
-1. User Details Collection:
-   After selecting a department, we need to collect the user's personal information (name, email, phone number, date of birth).
-
 2. Doctor Selection:
    We haven't implemented the feature to show a list of doctors from the selected department and allow the user to choose one.
 
@@ -43,3 +40,5 @@ Would you like to focus on implementing any of these features next?
 2. when they click on book appointment, send a message like "what can we help you with" and enable the input form
 3. whatever they type will be sent to gpt and the departments will be found and will be shown as buttons
 4. the user can click on which department theyd like to book an appointment for, and that will be shown as a message
+5. User Details Collection:
+   After selecting a department, we need to collect the user's personal information (name, email, phone number, date of birth).

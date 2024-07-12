@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Spinner, Button, Flex } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { fontSizeAtom } from "@/atoms/utils";
 
@@ -18,6 +18,10 @@ export default function ChatBubble({
 }: ChatBubbleProps) {
   const isUser = sender === "user";
   const useFS = useRecoilValue(fontSizeAtom);
+
+  const formatText = (text: string) => {
+    return text.replace(/\n/g, "<br />");
+  };
 
   return (
     <div
@@ -40,7 +44,11 @@ export default function ChatBubble({
         <p
           className={`px-3 py-2 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px]`}
         >
-          {sender === "system" ? <Spinner size="sm" /> : text}
+          {sender === "system" ? (
+            <Spinner size="sm" />
+          ) : (
+            <span dangerouslySetInnerHTML={{ __html: formatText(text) }} />
+          )}
         </p>
         <div
           className={`px-3 py-1 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px] text-gray-500`}

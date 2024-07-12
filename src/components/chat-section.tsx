@@ -1,21 +1,30 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Flex, VStack } from "@chakra-ui/react";
+import { Box, Flex, Input, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Message } from "../lib/types";
+import { Message, UserDetails } from "../lib/types";
 import InputForm from "./chat/input-form";
 import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
 import CText from "./core/ctext";
 import { Button } from "./ui/button";
+import AppointmentForm from "./chat/appointment-form";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
     useFrequentlyAskedOperations();
   const [showOptions, setShowOptions] = useState(false);
   const [showInputForm, setShowInputForm] = useState(false);
+  const [showUserDetailsForm, setShowUserDetailsForm] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [departments, setDepartments] = useState<string[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [userDetails, setUserDetails] = useState<UserDetails>({
+    name: "",
+    email: "",
+    phone: "",
+    dob: "",
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -117,8 +126,52 @@ const Chat: React.FC = () => {
       sender: "user",
       timestamp: new Date().toLocaleString(),
     };
+    setSelectedDepartment(department);
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setDepartments([]);
+
+    const assistantMessage: Message = {
+      id: Date.now() + 1,
+      text: "Great! Please provide your personal details for the appointment.",
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    setShowUserDetailsForm(true);
+  };
+
+  const handleUserDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
+  };
+
+  const handleUserDetailsSubmit = () => {
+    if (
+      !userDetails.name ||
+      !userDetails.email ||
+      !userDetails.phone ||
+      !userDetails.dob
+    ) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `Name: ${userDetails.name}\nEmail: ${userDetails.email}\nPhone: ${userDetails.phone}\nDate of Birth: ${userDetails.dob}`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setShowUserDetailsForm(false);
+
+    const assistantMessage: Message = {
+      id: Date.now() + 1,
+      text: "Thank you for providing your details. Let me find available doctors for you.",
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    // Add logic to fetch and display doctors
   };
 
   return (
@@ -148,6 +201,13 @@ const Chat: React.FC = () => {
               </Button>
             ))}
           </VStack>
+        )}
+        {showUserDetailsForm && (
+          <AppointmentForm
+            handleUserDetailsChange={handleUserDetailsChange}
+            handleUserDetailsSubmit={handleUserDetailsSubmit}
+            userDetails={userDetails}
+          />
         )}
         <div ref={messagesEndRef} />
       </Flex>
