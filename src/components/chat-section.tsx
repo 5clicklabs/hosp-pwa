@@ -1,6 +1,8 @@
-import { Button, Flex, VStack } from "@chakra-ui/react";
-import { AnimatePresence } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
+import { Button, Flex, VStack, Textarea, Spinner } from "@chakra-ui/react";
+import { AnimatePresence } from "framer-motion";
+import { ArrowUp } from "lucide-react";
+import { toast } from "sonner";
 import ChatBubble from "./core/chat-bubble";
 import CText from "./core/ctext";
 
@@ -14,7 +16,11 @@ interface Message {
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showOptions, setShowOptions] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [showInputForm, setShowInputForm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -25,6 +31,12 @@ const Chat: React.FC = () => {
     };
     setMessages([welcomeMessage]);
     setShowOptions(true);
+  }, []);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "20px";
+    }
   }, []);
 
   useEffect(() => {
@@ -40,7 +52,74 @@ const Chat: React.FC = () => {
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setShowOptions(false);
-    // Here you would typically handle the next step based on the selected option
+
+    if (option === "Book an appointment") {
+      const assistantMessage: Message = {
+        id: Date.now() + 1,
+        text: "What can we help you with?",
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      setShowInputForm(true);
+    }
+    // Handle other options here
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(event.target.value);
+    autoResizeTextarea(event.target);
+  };
+
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (message.length > 500) {
+      toast.error("This message is too long, please type a shorter message.");
+      return;
+    }
+
+    if (message.trim() === "") {
+      toast.info("You need to type a message first.");
+      return;
+    }
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: message,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setMessage("");
+    setIsFetching(true);
+    setShowInputForm(false); // Hide the input form after submission
+
+    // Here you would call your AI service
+    // For now, let's just simulate a response
+    setTimeout(() => {
+      const aiResponse: Message = {
+        id: Date.now() + 1,
+        text: "Thank you for providing that information. Based on your symptoms, I recommend the following departments: Gastroenterology, Internal Medicine. Please choose one:",
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      };
+      setMessages((prevMessages) => [...prevMessages, aiResponse]);
+      setIsFetching(false);
+      // Here you would typically show department selection options
+    }, 1000);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit(event as unknown as React.FormEvent);
+    }
   };
 
   return (
@@ -101,6 +180,53 @@ const Chat: React.FC = () => {
         )}
         <div ref={messagesEndRef} />
       </Flex>
+      {showInputForm && (
+        <form onSubmit={handleSubmit} className="w-full">
+          <Flex
+            borderRadius={50}
+            bg="white"
+            justify="space-between"
+            width="100%"
+            align="center"
+            px={2}
+          >
+            <Textarea
+              ref={textareaRef}
+              placeholder="Describe your symptoms..."
+              _placeholder={{
+                color: "gray.400",
+                fontSize: "14px",
+              }}
+              _focusVisible={{ outline: "none", boxShadow: "none" }}
+              borderRadius={50}
+              border="none"
+              resize="none"
+              value={message}
+              onChange={handleChange}
+              onKeyDown={handleKeyPress}
+              style={{
+                overflow: "hidden",
+                minHeight: "56px",
+                maxHeight: "200px",
+              }}
+              disabled={isFetching}
+            />
+            <Button
+              type="submit"
+              bg="#D0D4DD"
+              p={2}
+              borderRadius={999}
+              disabled={isFetching}
+            >
+              {isFetching ? (
+                <Spinner size="sm" />
+              ) : (
+                <ArrowUp className="w-5 h-5 text-gray-600" />
+              )}
+            </Button>
+          </Flex>
+        </form>
+      )}
     </Flex>
   );
 };
