@@ -1,67 +1,46 @@
-import messagesAtom from "@/atoms/messagesAtom";
-import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Button, Flex, Spinner, Textarea } from "@chakra-ui/react";
+import { Button, Flex, VStack } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
-import { ArrowUp } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
-import { toast } from "sonner";
+import React, { useEffect, useRef, useState } from "react";
 import ChatBubble from "./core/chat-bubble";
+import CText from "./core/ctext";
 
-export default function Chat() {
-  const [message, setMessage] = useState("");
-  const [messages, _] = useRecoilState(messagesAtom);
-  const { sendMessageToAI } = useFrequentlyAskedOperations();
-  const [isFetching, setIsFetching] = useState<boolean>(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+interface Message {
+  id: number;
+  text: string;
+  sender: "user" | "assistant";
+  timestamp: string;
+}
+
+const Chat: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [showOptions, setShowOptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "20px";
-    }
+    const welcomeMessage: Message = {
+      id: 1,
+      text: "Welcome to Manipal Hospital. How may I help you?",
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages([welcomeMessage]);
+    setShowOptions(true);
   }, []);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(event.target.value);
-    autoResizeTextarea(event.target);
-  };
-
-  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (message.length > 500) {
-      toast.error("This message is too long, please type a shorter message.");
-      return;
-    }
-
-    if (message.trim() === "") {
-      toast.info("You need to type a message first.");
-      return;
-    }
-
-    setMessage("");
-    setIsFetching(true);
-
-    await sendMessageToAI(message);
-    setIsFetching(false);
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      handleSubmit(event as unknown as React.FormEvent);
-    }
+  const handleOptionSelect = (option: string) => {
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `${option}`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setShowOptions(false);
+    // Here you would typically handle the next step based on the selected option
   };
 
   return (
@@ -82,65 +61,48 @@ export default function Chat() {
         mb={2}
       >
         <AnimatePresence>
-          {messages.map((msg) => (
+          {messages.map((message) => (
             <ChatBubble
-              key={msg.id}
-              id={msg.id}
-              text={msg.text}
-              timestamp={msg.timestamp}
-              sender={msg.sender}
+              key={message.id}
+              id={message.id}
+              text={message.text}
+              sender={message.sender}
+              timestamp={message.timestamp}
             />
           ))}
         </AnimatePresence>
+        {showOptions && (
+          <VStack align="stretch" spacing={2} mt={4}>
+            <Button
+              size="md"
+              bg="#1f2937"
+              color="white"
+              onClick={() => handleOptionSelect("Book an appointment")}
+            >
+              <CText>Book an appointment</CText>
+            </Button>
+            <Button
+              size="md"
+              bg="#1f2937"
+              color="white"
+              onClick={() => handleOptionSelect("Get Lab Reports")}
+            >
+              <CText>Get Lab Reports</CText>
+            </Button>
+            <Button
+              size="md"
+              bg="#1f2937"
+              color="white"
+              onClick={() => handleOptionSelect("General Inquiry")}
+            >
+              <CText>General Inquiry</CText>
+            </Button>
+          </VStack>
+        )}
         <div ref={messagesEndRef} />
       </Flex>
-
-      <form onSubmit={handleSubmit} className="w-full">
-        <Flex
-          borderRadius={50}
-          bg="white"
-          justify="space-between"
-          width="100%"
-          align="center"
-          px={2}
-        >
-          <Textarea
-            ref={textareaRef}
-            placeholder="Ask me a question..."
-            _placeholder={{
-              color: "gray.400",
-              fontSize: "14px",
-            }}
-            _focusVisible={{ outline: "none", boxShadow: "none" }}
-            borderRadius={50}
-            border="none"
-            resize="none"
-            value={message}
-            onChange={handleChange}
-            onKeyDown={handleKeyPress}
-            style={{
-              overflow: "hidden",
-              minHeight: "56px",
-              maxHeight: "200px",
-            }}
-            disabled={isFetching}
-          />
-
-          <Button
-            type="submit"
-            bg="#D0D4DD"
-            p={2}
-            borderRadius={999}
-            disabled={isFetching}
-          >
-            {isFetching ? (
-              <Spinner size="sm" />
-            ) : (
-              <ArrowUp className="w-5 h-5 text-gray-600" />
-            )}
-          </Button>
-        </Flex>
-      </form>
     </Flex>
   );
-}
+};
+
+export default Chat;

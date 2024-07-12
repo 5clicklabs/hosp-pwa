@@ -9,7 +9,7 @@ export default function useFrequentlyAskedOperations() {
   const [messages, setMessages] = useRecoilState(messagesAtom);
   const useLS = useRecoilValue(languageAtom);
 
-  const sendMessageToAI = async (text: string) => {
+  const sendMessageToAI = async (text: string): Promise<void> => {
     const timestamp = new Date().toLocaleString();
     const id = new Date().getTime();
 
@@ -74,6 +74,18 @@ export default function useFrequentlyAskedOperations() {
           console.log("Appointment booked!");
         }
       }
+
+      return new Promise((resolve) => {
+        const checkMessage = () => {
+          const latestMessage = messages[messages.length - 1];
+          if (latestMessage && latestMessage.sender === "assistant") {
+            resolve();
+          } else {
+            setTimeout(checkMessage, 100);
+          }
+        };
+        checkMessage();
+      });
     } catch (error) {
       console.error(error);
       const failedMessage: Message = {

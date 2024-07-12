@@ -1,19 +1,21 @@
 import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
+import { Spinner, Button, Flex } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { fontSizeAtom } from "@/atoms/utils";
+
+interface ChatBubbleProps {
+  id: number;
+  text: string;
+  timestamp: string;
+  sender: "user" | "assistant" | "system";
+}
 
 export default function ChatBubble({
   id,
   text,
   timestamp,
   sender,
-}: {
-  id: number;
-  text: string;
-  timestamp: string;
-  sender: "user" | "assistant" | "system";
-}) {
+}: ChatBubbleProps) {
   const isUser = sender === "user";
   const useFS = useRecoilValue(fontSizeAtom);
 
