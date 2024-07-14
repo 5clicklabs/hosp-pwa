@@ -1,4 +1,4 @@
-import { fontSizeAtom, languageAtom } from "@/atoms/utils";
+import { fontSizeAtom } from "@/atoms/utils";
 import { Text, TextProps } from "@chakra-ui/react";
 import React from "react";
 import { useRecoilValue } from "recoil";

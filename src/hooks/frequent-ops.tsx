@@ -1,36 +1,18 @@
 import messagesAtom from "@/atoms/messagesAtom";
 import { languageAtom } from "@/atoms/utils";
-import { FrequentlyUsedCard, Message } from "@/lib/types";
+import { MANIPAL_DEPARTMENTS as PREDEFINED_DEPARTMENTS } from "@/lib/departments";
+import { FrequentlyUsedCard } from "@/lib/types";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { toast } from "sonner";
 
 export default function useFrequentlyAskedOperations() {
   const [messages, setMessages] = useRecoilState(messagesAtom);
   const useLS = useRecoilValue(languageAtom);
 
-  const sendMessageToAI = async (text: string) => {
-    const timestamp = new Date().toLocaleString();
-    const id = new Date().getTime();
-
-    const userMessage: Message = {
-      id,
-      text,
-      timestamp,
-      sender: "user",
-    };
-
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    const systemMessage: Message = {
-      id: id + 1,
-      text: "",
-      timestamp,
-      sender: "system",
-    };
-
-    setMessages((prevMessages) => [...prevMessages, systemMessage]);
-
+  const sendMessageToGPT = async (
+    message: string,
+    onChunk: (chunk: string) => void
+  ): Promise<string[]> => {
     try {
       const response = await fetch("/api/ai", {
         method: "POST",
@@ -38,7 +20,7 @@ export default function useFrequentlyAskedOperations() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt: text,
+          prompt: message,
           language: useLS.applicationLanguage,
           conversationHistory: messages.map((msg) => ({
             role: msg.sender === "user" ? "user" : "assistant",
@@ -47,56 +29,35 @@ export default function useFrequentlyAskedOperations() {
         }),
       });
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let content = "";
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = (await reader?.read()) ?? {
-          value: new Uint8Array(),
-          done: true,
-        };
-        done = doneReading;
-        const chunk = decoder.decode(value);
-        content += chunk;
-
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === id + 1
-              ? { ...msg, text: content, sender: "assistant" }
-              : msg
-          )
-        );
-
-        if (content.includes("Appointment booked successfully")) {
-          toast.success("Appointment booked successfully!");
-          console.log("Appointment booked!");
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } catch (error) {
-      console.error(error);
-      const failedMessage: Message = {
-        id: id + 1,
-        text: "Failed to fetch AI response.",
-        timestamp,
-        sender: "assistant",
-      };
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) => (msg.id === id + 1 ? failedMessage : msg))
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = "";
+
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        fullResponse += chunk;
+        onChunk(chunk);
+      }
+
+      const departments = extractDepartments(fullResponse);
+
+      const filteredDepartments = departments.filter(
+        (dept) => dept !== "Based"
       );
+
+      // return departments;
+      return filteredDepartments;
+    } catch (error) {
+      console.error("Error calling GPT API:", error);
+      throw error;
     }
   };
-
-  function getCurrentLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log("POSITION: ", position);
-      });
-    } else {
-      console.log("Geolocation is not supported by this browser.");
-    }
-  }
 
   const options: Array<FrequentlyUsedCard> = [
     {
@@ -106,7 +67,7 @@ export default function useFrequentlyAskedOperations() {
       subheading: "Access reports",
       directive: () => {
         console.log("Access lab is being called");
-        sendMessageToAI("I would like to access my lab reports.");
+        // sendMessageToAI("I would like to access my lab reports.");
       },
     },
     {
@@ -115,7 +76,7 @@ export default function useFrequentlyAskedOperations() {
       heading: "Make Appointments",
       subheading: "Book Appointments in seconds",
       directive: () => {
-        sendMessageToAI("I would like to make an appointment.");
+        // sendMessageToAI("I would like to make an appointment.");
       },
     },
     {
@@ -126,13 +87,51 @@ export default function useFrequentlyAskedOperations() {
       directive: () => {
         console.log("Phone call was called");
         // getCurrentLocation();
-        sendMessageToAI("I have an emergency and need assistance.");
+        // sendMessageToAI("I have an emergency and need assistance.");
       },
     },
   ];
 
   return {
     options,
-    sendMessageToAI,
+    sendMessageToGPT,
+    messages,
+    setMessages,
   };
 }
+
+const extractDepartments = (text: string): string[] => {
+  // Method 1: Look for "department(s):" followed by a list
+  const departmentRegex = /department[s]?:?\s*([\w\s,]+)(?=\.|\?|$)/i;
+  const match = text.match(departmentRegex);
+  if (match && match[1]) {
+    const extracted = match[1]
+      .split(/,|\sand\s/) // Split by comma or "and"
+      .map((dept) => dept.trim())
+      .filter(Boolean)
+      .filter((dept) => dept.length > 1); // Filter out single-character departments
+
+    if (extracted.length > 0) return extracted;
+  }
+
+  // Method 2: Look for any mentions of predefined departments
+  const mentionedDepartments = PREDEFINED_DEPARTMENTS.filter((dept) =>
+    text.toLowerCase().includes(dept.toLowerCase())
+  );
+  if (mentionedDepartments.length > 0) {
+    return mentionedDepartments;
+  }
+
+  // Method 3: Fallback to finding capitalized words that might be department names
+  const words = text.split(/\s+/);
+  const potentialDepartments = words.filter(
+    (word) => word.length > 1 && word[0] === word[0].toUpperCase()
+  );
+
+  // If we still couldn't find any departments, return a subset of predefined departments
+  if (potentialDepartments.length === 0) {
+    return PREDEFINED_DEPARTMENTS.slice(0, 3); // Return first 3 as a fallback
+  }
+
+  return potentialDepartments;
+};

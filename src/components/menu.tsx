@@ -9,11 +9,9 @@ import {
   DrawerFooter,
   DrawerOverlay,
   Flex,
-  Stack,
 } from "@chakra-ui/react";
 import React from "react";
 import { useRecoilState } from "recoil";
-import AddToHomeScreenPrompt from "./add-to-homescreen-prompt";
 import CText from "./core/ctext";
 import OpenAIStatus from "./status";
 
@@ -50,7 +48,6 @@ export default function HamburgerMenu() {
           </DrawerBody>
 
           <DrawerFooter className="w-full">
-            {/* <AddToHomeScreenPrompt /> */}
             <OpenAIStatus />
           </DrawerFooter>
         </DrawerContent>
