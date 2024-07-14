@@ -9,7 +9,7 @@ import { Switch } from "./ui/switch";
 export default function Hero() {
   return (
     <Flex direction="column" p={4}>
-      <MostFrequentlyAsked />
+      {/* <MostFrequentlyAsked /> */}
       <CText>Hi,</CText>
       <CText variant="subheading">What can I help you with?</CText>
     </Flex>
