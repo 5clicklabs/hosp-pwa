@@ -1,42 +1,10 @@
 import { MANIPAL_DEPARTMENTS } from "@/lib/departments";
-import { firestore } from "@/lib/firebase.config";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { addDoc, collection } from "firebase/firestore";
 
 const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
 });
-
-interface AppointmentData {
-  name: string;
-  email: string;
-  phone: string;
-  dob: string;
-  department: string;
-  drName: string;
-}
-
-async function bookAppointment(data: AppointmentData) {
-  const { name, email, phone, dob, department, drName } = data;
-
-  try {
-    const docRef = await addDoc(collection(firestore, "appointments"), {
-      name,
-      email,
-      phone,
-      dob,
-      department,
-      drName: drName ? drName : "",
-      createdAt: new Date().toISOString(),
-    });
-
-    return true;
-  } catch (e) {
-    console.error("Error adding document: ", e);
-    return false;
-  }
-}
 
 export default async function handler(
   req: NextApiRequest,
@@ -67,11 +35,12 @@ You are an AI assistant for Manipal Hospital's website and PWA. Your primary tas
 
 When a user describes their symptoms or health concerns:
 1. Identify the most relevant department(s) for their issue.
-2. Respond with a list of recommended departments in the following format:
+2. The list of departments that Manipal Hospitals have is as follows: ${departmentsList}.
+3. Respond with a list of recommended departments in the following format while making sure that the department exists in the list mentioned earlier:
    "Based on your symptoms, I recommend the following department(s): [Department1], [Department2], ..."
-3. Do not include any apologetic or emotional language in your response.
-4. If multiple departments are relevant, list them all.
-5. If you're unsure or the user's query is too vague, ask for more specific information about their symptoms.
+4. Do not include any apologetic or emotional language in your response.
+5. If multiple departments are relevant, list them all.
+6. If you're unsure or the user's query is too vague, ask for more specific information about their symptoms.
 7. Do not include any other text in your response.
 
 Always respond in the language: ${language}.
@@ -88,71 +57,14 @@ Always respond in the language: ${language}.
       model: "gpt-4",
       messages,
       stream: true,
-      functions: [
-        {
-          name: "bookAppointment",
-          description: "Book an appointment with the collected information",
-          parameters: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              email: { type: "string" },
-              phone: { type: "string" },
-              dob: { type: "string" },
-              department: { type: "string" },
-              drName: { type: "string" },
-            },
-            required: ["name", "email", "phone", "dob", "department"],
-          },
-        },
-      ],
-      function_call: "auto",
     });
 
-    let functionCallData = "";
-    let appointmentBooked = false;
-
     for await (const chunk of stream) {
-      if (chunk.choices[0]?.delta?.function_call) {
-        functionCallData +=
-          chunk.choices[0].delta.function_call.arguments || "";
-      } else if (chunk.choices[0]?.delta?.content) {
+      if (chunk.choices[0]?.delta?.content) {
         const content = chunk.choices[0].delta.content;
         res.write(content);
       }
-
-      // Check if this is the last chunk
-      if (
-        chunk.choices[0]?.finish_reason === "function_call" &&
-        !appointmentBooked
-      ) {
-        try {
-          const appointmentData: AppointmentData = JSON.parse(functionCallData);
-          const success = await bookAppointment(appointmentData);
-          if (success) {
-            res.write(
-              `\nAppointment booked successfully for ${appointmentData.name}.`
-            );
-            appointmentBooked = true;
-          } else {
-            res.write(
-              "\nThere was an error booking the appointment. Please try again."
-            );
-          }
-        } catch (error) {
-          console.error("Error booking appointment:", error);
-          res.write(
-            "\nThere was an error processing the appointment data. Please try again."
-          );
-        }
-      }
     }
-
-    // if (!appointmentBooked) {
-    //   res.write(
-    //     "\nNo appointment was booked. Please provide all necessary information and confirm."
-    //   );
-    // }
 
     res.end();
   } catch (error) {
