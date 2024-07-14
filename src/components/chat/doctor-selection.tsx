@@ -1,8 +1,9 @@
 import { Doctor } from "@/lib/types";
 import { Box, Flex, Image } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import CText from "../core/ctext";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 interface DoctorSelectionProps {
   doctors: Doctor[];
@@ -14,6 +15,18 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({
   onDoctorSelect,
 }) => {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredDoctors = useMemo(() => {
+    return doctors.filter(
+      (doctor) =>
+        doctor.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.short_description
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+    );
+  }, [doctors, searchTerm]);
 
   const handleDoctorClick = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
@@ -25,16 +38,27 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({
     }
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
   return (
     <Box>
+      <Input
+        placeholder="Search for a doctor..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        className="my-2 bg-white h-12"
+      />
       <Flex overflowX="auto" pb={4}>
-        {doctors.map((doctor) => (
+        {filteredDoctors.map((doctor) => (
           <Flex
             direction={"column"}
             align="center"
             justify="center"
             key={doctor.id}
             minWidth="200px"
+            maxW={"200px"}
             m={2}
             p={2}
             borderWidth={1}
@@ -57,6 +81,11 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({
             </CText>
           </Flex>
         ))}
+        {!filteredDoctors.length && (
+          <CText width="100%" textAlign="center">
+            No doctors found
+          </CText>
+        )}
       </Flex>
       {selectedDoctor && (
         <Button onClick={handleContinue} className="w-full">
