@@ -36,3 +36,15 @@ export interface DayAvailability {
   availableSlots: number;
   slots: string[];
 }
+
+export interface AppointmentData {
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  patientDOB: string;
+  doctorId: number;
+  doctorName: string;
+  department: string;
+  appointmentDate: Date;
+  appointmentTime: string;
+}

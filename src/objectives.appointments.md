@@ -33,4 +33,3 @@ Would you like to focus on implementing any of these features next?
 6. Doctor Selection:
    We haven't implemented the feature to show a list of doctors from the selected department and allow the user to choose one.
 7. Appointment Booking:
-   The actual process of booking the appointment and storing it in the database (Firestore) hasn't been implemented in the chat flow yet.

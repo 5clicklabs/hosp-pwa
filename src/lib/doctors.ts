@@ -2,6 +2,31 @@ import { Doctor } from "./types";
 
 export const MANIPAL_DOCTORS: Doctor[] = [
   {
+    fullName: "Dr. Mark Davis",
+    specialty: "Gastroenterologist",
+    department: "Gastroenterology",
+    short_description: "Expert in digestive system diseases and treatments.",
+    profile_picture: "https://via.placeholder.com/150?text=Dr.+Mark+Davis",
+    id: 230,
+  },
+  {
+    fullName: "Dr. Anna Martinez",
+    specialty: "Hepatologist",
+    department: "Gastroenterology",
+    short_description:
+      "Specializes in liver diseases and gastrointestinal health.",
+    profile_picture: "https://via.placeholder.com/150?text=Dr.+Anna+Martinez",
+    id: 231,
+  },
+  {
+    fullName: "Dr. David Wilson",
+    specialty: "Pediatric Gastroenterologist",
+    department: "Gastroenterology",
+    short_description: "Experienced in gastrointestinal disorders in children.",
+    profile_picture: "https://via.placeholder.com/150?text=Dr.+David+Wilson",
+    id: 232,
+  },
+  {
     fullName: "Dr. Sarah Johnson",
     specialty: "Pulmonologist",
     department: "Pulmonology",

@@ -103,7 +103,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
       className="rounded-2xl"
       bg={"white"}
     >
-      <CText fontWeight="bold">{doctorName}&apos;s Calendar</CText>
+      <CText textAlign={"center"} fontWeight="bold">
+        {doctorName}&apos;s Calendar
+      </CText>
       <Calendar
         mode="single"
         selected={selectedDate}

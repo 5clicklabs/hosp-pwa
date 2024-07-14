@@ -1,8 +1,8 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Box, Flex, Input, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spinner, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Doctor, Message, UserDetails } from "../lib/types";
+import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
 import InputForm from "./chat/input-form";
 import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
@@ -12,6 +12,7 @@ import AppointmentForm from "./chat/appointment-form";
 import DoctorSelection from "./chat/doctor-selection";
 import { MANIPAL_DOCTORS } from "@/lib/doctors";
 import { AppointmentCalendar } from "./chat/appointment-calendar";
+import useOperations from "@/hooks/operations";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -35,6 +36,12 @@ const Chat: React.FC = () => {
   const [showAppointmentCalendar, setShowAppointmentCalendar] = useState(false);
   const [previouslySelectedDoctor, setPreviouslySelectedDoctor] =
     useState<Doctor | null>(null);
+  const [showConfirmAppointmentButton, setShowConfirmAppointmentButton] =
+    useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+
+  const { bookAppointment, isBooking } = useOperations();
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -219,16 +226,19 @@ const Chat: React.FC = () => {
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setShowAppointmentCalendar(false);
+    setSelectedDate(date);
+    setSelectedSlot(time);
 
     const assistantMessage: Message = {
       id: Date.now() + 1,
-      text: `Confirming your appointment with ${
+      text: `Do I confirm your appointment with ${
         selectedDoctor!.fullName
       } on ${date.toDateString()} at ${time}?`,
       sender: "assistant",
       timestamp: new Date().toLocaleString(),
     };
     setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    setShowConfirmAppointmentButton(true);
   };
 
   const handleBackToDoctors = () => {
@@ -252,6 +262,32 @@ const Chat: React.FC = () => {
       timestamp: new Date().toLocaleString(),
     };
     setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+  };
+
+  const handleConfirmAppointment = async () => {
+    try {
+      const appointmentData: AppointmentData = {
+        patientName: userDetails.name,
+        patientEmail: userDetails.email,
+        patientPhone: userDetails.phone,
+        patientDOB: userDetails.dob,
+        doctorId: selectedDoctor!.id,
+        doctorName: selectedDoctor!.fullName,
+        department: selectedDepartment,
+        appointmentDate: selectedDate!,
+        appointmentTime: selectedSlot!,
+      };
+      const appointmentId = await bookAppointment(appointmentData);
+
+      toast.success(
+        "Appointment booked successfully. Your Appointment ID is " +
+          appointmentId
+      );
+      setShowConfirmAppointmentButton(false);
+    } catch (error: any) {
+      console.error("Failed to book appointment:", error);
+      toast.error("Failed to book appointment. Please try again.");
+    }
   };
 
   return (
@@ -302,6 +338,11 @@ const Chat: React.FC = () => {
             onAppointmentSelect={handleAppointmentSelect}
             onBackToDoctors={handleBackToDoctors}
           />
+        )}
+        {showConfirmAppointmentButton && (
+          <Button onClick={handleConfirmAppointment}>
+            {isBooking ? <Spinner size="sm" /> : "Confirm Appointment"}
+          </Button>
         )}
         <div ref={messagesEndRef} />
       </Flex>
