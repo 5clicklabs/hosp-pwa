@@ -1,7 +1,8 @@
-import { VStack, Button, Box, Input } from "@chakra-ui/react";
+import { VStack, Box, Input } from "@chakra-ui/react";
 import React from "react";
 import CText from "../core/ctext";
 import { UserDetails } from "@/lib/types";
+import { Button } from "../ui/button";
 
 interface AppointmentFormProps {
   userDetails: UserDetails;
@@ -23,6 +24,7 @@ export default function AppointmentForm({
             placeholder="Full Name"
             value={userDetails.name}
             onChange={handleUserDetailsChange}
+            required
           />
           <Input
             name="email"
@@ -30,6 +32,7 @@ export default function AppointmentForm({
             type="email"
             value={userDetails.email}
             onChange={handleUserDetailsChange}
+            required
           />
           <Input
             name="phone"
@@ -37,15 +40,16 @@ export default function AppointmentForm({
             type="tel"
             value={userDetails.phone}
             onChange={handleUserDetailsChange}
+            required
           />
           <Input
             name="dob"
             placeholder="Date of Birth (DD/MM/YYYY)"
-            type="text"
+            type="date"
             value={userDetails.dob}
             onChange={handleUserDetailsChange}
           />
-          <Button onClick={handleUserDetailsSubmit}>
+          <Button onClick={handleUserDetailsSubmit} className="w-full">
             <CText>Submit Details</CText>
           </Button>
         </VStack>

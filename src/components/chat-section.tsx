@@ -2,13 +2,15 @@ import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { Box, Flex, Input, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Message, UserDetails } from "../lib/types";
+import { Doctor, Message, UserDetails } from "../lib/types";
 import InputForm from "./chat/input-form";
 import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
 import CText from "./core/ctext";
 import { Button } from "./ui/button";
 import AppointmentForm from "./chat/appointment-form";
+import DoctorSelection from "./chat/doctor-selection";
+import { MANIPAL_DOCTORS } from "@/lib/doctors";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -26,6 +28,8 @@ const Chat: React.FC = () => {
     dob: "",
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
+  const [showDoctorSelection, setShowDoctorSelection] = useState(false);
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -164,14 +168,38 @@ const Chat: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setShowUserDetailsForm(false);
 
+    const departmentDoctors = MANIPAL_DOCTORS.filter(
+      (doctor) => doctor.department === selectedDepartment
+    );
+    setFilteredDoctors(departmentDoctors);
+
     const assistantMessage: Message = {
       id: Date.now() + 1,
-      text: "Thank you for providing your details. Let me find available doctors for you.",
+      text: `Please select a doctor from the ${selectedDepartment} department to continue. `,
       sender: "assistant",
       timestamp: new Date().toLocaleString(),
     };
     setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-    // Add logic to fetch and display doctors
+    setShowDoctorSelection(true);
+  };
+
+  const handleDoctorSelect = (doctor: Doctor) => {
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `${doctor.fullName}`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setShowDoctorSelection(false);
+
+    const assistantMessage: Message = {
+      id: Date.now() + 1,
+      text: `Let's proceed to schedule your appointment.`,
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
   };
 
   return (
@@ -207,6 +235,12 @@ const Chat: React.FC = () => {
             handleUserDetailsChange={handleUserDetailsChange}
             handleUserDetailsSubmit={handleUserDetailsSubmit}
             userDetails={userDetails}
+          />
+        )}
+        {showDoctorSelection && (
+          <DoctorSelection
+            doctors={filteredDoctors}
+            onDoctorSelect={handleDoctorSelect}
           />
         )}
         <div ref={messagesEndRef} />

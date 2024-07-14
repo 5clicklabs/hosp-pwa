@@ -21,7 +21,7 @@ export default function useFrequentlyAskedOperations() {
         },
         body: JSON.stringify({
           prompt: message,
-          language: "en",
+          language: useLS.applicationLanguage,
           conversationHistory: messages.map((msg) => ({
             role: msg.sender === "user" ? "user" : "assistant",
             content: msg.text,

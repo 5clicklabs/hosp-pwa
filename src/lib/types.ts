@@ -21,3 +21,12 @@ export interface UserDetails {
   phone: string;
   dob: string;
 }
+
+export interface Doctor {
+  fullName: string;
+  specialty: string;
+  department: string;
+  short_description: string;
+  profile_picture: string;
+  id: number;
+}
