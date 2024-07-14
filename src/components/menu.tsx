@@ -48,7 +48,6 @@ export default function HamburgerMenu() {
           </DrawerBody>
 
           <DrawerFooter className="w-full">
-            {/* <AddToHomeScreenPrompt /> */}
             <OpenAIStatus />
           </DrawerFooter>
         </DrawerContent>

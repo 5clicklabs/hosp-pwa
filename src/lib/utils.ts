@@ -47,8 +47,8 @@ UID:${appointmentData.doctorId}-${startDate.getTime()}
 DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
 DTSTART:${startDate.toISOString().replace(/[-:]/g, "").split(".")[0]}Z
 DTEND:${endDate.toISOString().replace(/[-:]/g, "").split(".")[0]}Z
-SUMMARY:Appointment with Dr. ${appointmentData.doctorName}
-DESCRIPTION:Appointment at Manipal Hospital with Dr. ${
+SUMMARY:Appointment with ${appointmentData.doctorName}
+DESCRIPTION:Appointment at Manipal Hospital with ${
     appointmentData.doctorName
   } (${appointmentData.department})
 LOCATION:Manipal Hospital
