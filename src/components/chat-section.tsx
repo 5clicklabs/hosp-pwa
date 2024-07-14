@@ -13,6 +13,7 @@ import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
 import CText from "./core/ctext";
 import { Button } from "./ui/button";
+import { downloadICSFile } from "@/lib/utils";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -293,14 +294,29 @@ const Chat: React.FC = () => {
       };
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
 
-      const assistantMessage2: Message = {
-        id: Date.now() + 1,
-        text: `Is there anything else I can help you with?`,
+      const addToCalendarMessage: Message = {
+        id: Date.now() + 2,
+        text: "Would you like to add this appointment to your calendar? ",
         sender: "assistant",
         timestamp: new Date().toLocaleString(),
+        action: {
+          type: "button",
+          text: "Add to Calendar",
+          onClick: () => downloadICSFile(appointmentData),
+        },
       };
-      setMessages((prevMessages) => [...prevMessages, assistantMessage2]);
-      setShowOptions(true);
+      setMessages((prevMessages) => [...prevMessages, addToCalendarMessage]);
+
+      setTimeout(() => {
+        const assistantMessage2: Message = {
+          id: Date.now() + 1,
+          text: `Is there anything else I can help you with?`,
+          sender: "assistant",
+          timestamp: new Date().toLocaleString(),
+        };
+        setMessages((prevMessages) => [...prevMessages, assistantMessage2]);
+        setShowOptions(true);
+      }, 5000);
     } catch (error: any) {
       console.error("Failed to book appointment:", error);
       toast.error("Failed to book appointment. Please try again.");

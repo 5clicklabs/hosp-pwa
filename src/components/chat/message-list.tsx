@@ -10,13 +10,7 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ messages }) => (
   <AnimatePresence>
     {messages.map((message) => (
-      <ChatBubble
-        key={message.id}
-        id={message.id}
-        text={message.text}
-        sender={message.sender}
-        timestamp={message.timestamp}
-      />
+      <ChatBubble key={message.id} {...message} />
     ))}
   </AnimatePresence>
 );

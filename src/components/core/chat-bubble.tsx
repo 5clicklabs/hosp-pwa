@@ -1,21 +1,17 @@
 import { fontSizeAtom } from "@/atoms/utils";
+import { Message } from "@/lib/types";
 import { Spinner } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useRecoilValue } from "recoil";
-
-interface ChatBubbleProps {
-  id: number;
-  text: string;
-  timestamp: string;
-  sender: "user" | "assistant" | "system";
-}
+import { Button } from "../ui/button";
 
 export default function ChatBubble({
   id,
   text,
   timestamp,
   sender,
-}: ChatBubbleProps) {
+  action,
+}: Message) {
   const isUser = sender === "user";
   const useFS = useRecoilValue(fontSizeAtom);
 
@@ -50,6 +46,16 @@ export default function ChatBubble({
             <span dangerouslySetInnerHTML={{ __html: formatText(text) }} />
           )}
         </p>
+        {action && action.type === "button" && (
+          <div className="p-2">
+            <Button
+              onClick={action.onClick}
+              className="bg-white text-black hover:bg-gray-300"
+            >
+              {action.text}
+            </Button>
+          </div>
+        )}
         <div
           className={`px-3 py-1 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px] text-gray-500`}
         >

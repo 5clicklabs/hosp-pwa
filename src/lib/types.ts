@@ -11,8 +11,13 @@ export interface FrequentlyUsedCard {
 export interface Message {
   id: number;
   text: string;
-  timestamp: string;
   sender: "user" | "assistant" | "system";
+  timestamp: string;
+  action?: {
+    type: "button";
+    text: string;
+    onClick: () => void;
+  };
 }
 
 export interface UserDetails {
