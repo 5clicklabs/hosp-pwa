@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
-import { useRecoilValue } from "recoil";
 import { fontSizeAtom } from "@/atoms/utils";
+import { Spinner } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { useRecoilValue } from "recoil";
 
 interface ChatBubbleProps {
   id: number;

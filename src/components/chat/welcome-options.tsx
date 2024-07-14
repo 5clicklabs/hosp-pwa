@@ -1,5 +1,5 @@
-import React from "react";
 import { VStack } from "@chakra-ui/react";
+import React from "react";
 import CText from "../core/ctext";
 import { Button } from "../ui/button";
 

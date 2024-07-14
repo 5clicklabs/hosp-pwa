@@ -1,6 +1,6 @@
 import { Doctor } from "@/lib/types";
 import { Box, Flex, Image } from "@chakra-ui/react";
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import CText from "../core/ctext";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";

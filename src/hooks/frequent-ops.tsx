@@ -1,7 +1,7 @@
 import messagesAtom from "@/atoms/messagesAtom";
 import { languageAtom } from "@/atoms/utils";
 import { MANIPAL_DEPARTMENTS as PREDEFINED_DEPARTMENTS } from "@/lib/departments";
-import { FrequentlyUsedCard, Message } from "@/lib/types";
+import { FrequentlyUsedCard } from "@/lib/types";
 import { Ambulance, ClipboardPlus, PhoneCall } from "lucide-react";
 import { useRecoilState, useRecoilValue } from "recoil";
 

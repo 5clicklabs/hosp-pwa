@@ -1,18 +1,18 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
-import { Box, Flex, Spinner, VStack } from "@chakra-ui/react";
+import useOperations from "@/hooks/operations";
+import { MANIPAL_DOCTORS } from "@/lib/doctors";
+import { Flex, Spinner, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
+import { AppointmentCalendar } from "./chat/appointment-calendar";
+import AppointmentForm from "./chat/appointment-form";
+import DoctorSelection from "./chat/doctor-selection";
 import InputForm from "./chat/input-form";
 import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
 import CText from "./core/ctext";
 import { Button } from "./ui/button";
-import AppointmentForm from "./chat/appointment-form";
-import DoctorSelection from "./chat/doctor-selection";
-import { MANIPAL_DOCTORS } from "@/lib/doctors";
-import { AppointmentCalendar } from "./chat/appointment-calendar";
-import useOperations from "@/hooks/operations";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -284,6 +284,23 @@ const Chat: React.FC = () => {
           appointmentId
       );
       setShowConfirmAppointmentButton(false);
+
+      const assistantMessage: Message = {
+        id: Date.now() + 1,
+        text: `Your appointment has been booked successfully.`,
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+
+      const assistantMessage2: Message = {
+        id: Date.now() + 1,
+        text: `Is there anything else I can help you with?`,
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage2]);
+      setShowOptions(true);
     } catch (error: any) {
       console.error("Failed to book appointment:", error);
       toast.error("Failed to book appointment. Please try again.");

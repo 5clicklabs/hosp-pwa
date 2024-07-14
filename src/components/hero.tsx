@@ -1,10 +1,10 @@
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { Flex } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import React from "react";
+import CText from "./core/ctext";
 import Card from "./core/frequent-card";
 import { Switch } from "./ui/switch";
-import React from "react";
-import { motion } from "framer-motion";
-import CText from "./core/ctext";
 
 export default function Hero() {
   return (

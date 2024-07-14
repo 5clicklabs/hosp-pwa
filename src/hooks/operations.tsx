@@ -1,6 +1,6 @@
 import { firestore } from "@/lib/firebase.config";
 import { AppointmentData } from "@/lib/types";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useState } from "react";
 
 export default function useOperations() {

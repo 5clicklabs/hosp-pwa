@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button, Flex, Textarea, Spinner } from "@chakra-ui/react";
+import { Button, Flex, Spinner, Textarea } from "@chakra-ui/react";
 import { ArrowUp } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface InputFormProps {

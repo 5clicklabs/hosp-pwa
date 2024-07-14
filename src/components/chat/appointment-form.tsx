@@ -1,7 +1,7 @@
-import { VStack, Box, Input } from "@chakra-ui/react";
+import { UserDetails } from "@/lib/types";
+import { Box, Input, VStack } from "@chakra-ui/react";
 import React from "react";
 import CText from "../core/ctext";
-import { UserDetails } from "@/lib/types";
 import { Button } from "../ui/button";
 
 interface AppointmentFormProps {
