@@ -8,11 +8,13 @@ import { Input } from "../ui/input";
 interface DoctorSelectionProps {
   doctors: Doctor[];
   onDoctorSelect: (doctor: Doctor) => void;
+  previouslySelectedDoctor: Doctor | null;
 }
 
 const DoctorSelection: React.FC<DoctorSelectionProps> = ({
   doctors,
   onDoctorSelect,
+  previouslySelectedDoctor,
 }) => {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,6 +70,12 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({
             color={selectedDoctor?.id === doctor.id ? "white" : "black"}
             cursor="pointer"
           >
+            {previouslySelectedDoctor &&
+              previouslySelectedDoctor.id === doctor.id && (
+                <CText fontSize="xs" color="gray.500" mb={2}>
+                  You previously picked
+                </CText>
+              )}
             <Image
               src={doctor.profile_picture}
               alt={doctor.fullName}
@@ -89,7 +97,7 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({
       </Flex>
       {selectedDoctor && (
         <Button onClick={handleContinue} className="w-full">
-          <CText>Continue with Dr. {selectedDoctor.fullName}</CText>
+          <CText>Continue with {selectedDoctor.fullName}</CText>
         </Button>
       )}
     </Box>

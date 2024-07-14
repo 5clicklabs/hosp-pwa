@@ -30,3 +30,9 @@ export interface Doctor {
   profile_picture: string;
   id: number;
 }
+
+export interface DayAvailability {
+  date: Date;
+  availableSlots: number;
+  slots: string[];
+}

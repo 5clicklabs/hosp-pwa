@@ -11,6 +11,7 @@ import { Button } from "./ui/button";
 import AppointmentForm from "./chat/appointment-form";
 import DoctorSelection from "./chat/doctor-selection";
 import { MANIPAL_DOCTORS } from "@/lib/doctors";
+import { AppointmentCalendar } from "./chat/appointment-calendar";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -30,6 +31,10 @@ const Chat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [showDoctorSelection, setShowDoctorSelection] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [showAppointmentCalendar, setShowAppointmentCalendar] = useState(false);
+  const [previouslySelectedDoctor, setPreviouslySelectedDoctor] =
+    useState<Doctor | null>(null);
 
   useEffect(() => {
     const welcomeMessage: Message = {
@@ -184,6 +189,9 @@ const Chat: React.FC = () => {
   };
 
   const handleDoctorSelect = (doctor: Doctor) => {
+    setSelectedDoctor(doctor);
+    setShowDoctorSelection(false);
+
     const userMessage: Message = {
       id: Date.now(),
       text: `${doctor.fullName}`,
@@ -191,11 +199,55 @@ const Chat: React.FC = () => {
       timestamp: new Date().toLocaleString(),
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setShowDoctorSelection(false);
 
     const assistantMessage: Message = {
       id: Date.now() + 1,
       text: `Let's proceed to schedule your appointment.`,
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    setShowAppointmentCalendar(true);
+  };
+
+  const handleAppointmentSelect = (date: Date, time: string) => {
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `Selected appointment: ${date.toDateString()} at ${time}`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setShowAppointmentCalendar(false);
+
+    const assistantMessage: Message = {
+      id: Date.now() + 1,
+      text: `Confirming your appointment with ${
+        selectedDoctor!.fullName
+      } on ${date.toDateString()} at ${time}?`,
+      sender: "assistant",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+  };
+
+  const handleBackToDoctors = () => {
+    setPreviouslySelectedDoctor(selectedDoctor);
+    setSelectedDoctor(null);
+    setShowAppointmentCalendar(false);
+    setShowDoctorSelection(true);
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: `I'd like to select a different doctor.`,
+      sender: "user",
+      timestamp: new Date().toLocaleString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    const assistantMessage: Message = {
+      id: Date.now() + 1,
+      text: `Okay, Please select from the available doctors below.`,
       sender: "assistant",
       timestamp: new Date().toLocaleString(),
     };
@@ -241,6 +293,14 @@ const Chat: React.FC = () => {
           <DoctorSelection
             doctors={filteredDoctors}
             onDoctorSelect={handleDoctorSelect}
+            previouslySelectedDoctor={previouslySelectedDoctor}
+          />
+        )}
+        {showAppointmentCalendar && selectedDoctor && (
+          <AppointmentCalendar
+            doctorName={selectedDoctor.fullName}
+            onAppointmentSelect={handleAppointmentSelect}
+            onBackToDoctors={handleBackToDoctors}
           />
         )}
         <div ref={messagesEndRef} />
