@@ -14,9 +14,8 @@ import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
 interface AppointmentFlowProps {
   addMessage: (message: Message) => void;
   sendMessageToGPT: (
-    message: string,
-    onChunk: (chunk: string) => void
-  ) => Promise<string[]>;
+    message: string
+  ) => Promise<{ response: string; departments: string[] }>;
   onFlowComplete: () => void;
 }
 
@@ -73,17 +72,17 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
     });
 
     try {
-      const extractedDepartments = await sendMessageToGPT(message, (chunk) => {
-        addMessage({
-          id: Date.now(),
-          text: chunk,
-          sender: "assistant",
-          timestamp: new Date().toLocaleString(),
-        });
+      const { response, departments } = await sendMessageToGPT(message);
+
+      addMessage({
+        id: Date.now(),
+        text: response,
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
       });
 
-      if (extractedDepartments.length > 0) {
-        setDepartments(extractedDepartments);
+      if (departments.length > 0) {
+        setDepartments(departments);
         setStep("departments");
       } else {
         addMessage({

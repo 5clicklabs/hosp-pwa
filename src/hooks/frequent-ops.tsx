@@ -10,9 +10,8 @@ export default function useFrequentlyAskedOperations() {
   const useLS = useRecoilValue(languageAtom);
 
   const sendMessageToGPT = async (
-    message: string,
-    onChunk: (chunk: string) => void
-  ): Promise<string[]> => {
+    message: string
+  ): Promise<{ response: string; departments: string[] }> => {
     try {
       const response = await fetch("/api/ai", {
         method: "POST",
@@ -33,26 +32,17 @@ export default function useFrequentlyAskedOperations() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullResponse = "";
+      const data = await response.json();
 
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        fullResponse += chunk;
-        onChunk(chunk);
+      // If the server didn't provide departments, extract them here
+      if (!data.departments || data.departments.length === 0) {
+        data.departments = extractDepartments(data.response);
       }
 
-      const departments = extractDepartments(fullResponse);
-
-      const filteredDepartments = departments.filter(
-        (dept) => dept !== "Based"
-      );
-
-      // return departments;
-      return filteredDepartments;
+      return {
+        response: data.response,
+        departments: data.departments,
+      };
     } catch (error) {
       console.error("Error calling GPT API:", error);
       throw error;
@@ -67,7 +57,7 @@ export default function useFrequentlyAskedOperations() {
       subheading: "Access reports",
       directive: () => {
         console.log("Access lab is being called");
-        // sendMessageToAI("I would like to access my lab reports.");
+        // Implement lab reports functionality here
       },
     },
     {
@@ -76,7 +66,7 @@ export default function useFrequentlyAskedOperations() {
       heading: "Make Appointments",
       subheading: "Book Appointments in seconds",
       directive: () => {
-        // sendMessageToAI("I would like to make an appointment.");
+        // This will be handled in the main component now
       },
     },
     {
@@ -86,8 +76,7 @@ export default function useFrequentlyAskedOperations() {
       subheading: "Call the nearest Manipal Hospital",
       directive: () => {
         console.log("Phone call was called");
-        // getCurrentLocation();
-        // sendMessageToAI("I have an emergency and need assistance.");
+        // Implement emergency call functionality here
       },
     },
   ];
@@ -109,7 +98,8 @@ const extractDepartments = (text: string): string[] => {
       .split(/,|\sand\s/) // Split by comma or "and"
       .map((dept) => dept.trim())
       .filter(Boolean)
-      .filter((dept) => dept.length > 1); // Filter out single-character departments
+      .filter((dept) => dept.length > 1) // Filter out single-character departments
+      .filter((dept) => PREDEFINED_DEPARTMENTS.includes(dept)); // Ensure only valid departments are included
 
     if (extracted.length > 0) return extracted;
   }
@@ -124,9 +114,9 @@ const extractDepartments = (text: string): string[] => {
 
   // Method 3: Fallback to finding capitalized words that might be department names
   const words = text.split(/\s+/);
-  const potentialDepartments = words.filter(
-    (word) => word.length > 1 && word[0] === word[0].toUpperCase()
-  );
+  const potentialDepartments = words
+    .filter((word) => word.length > 1 && word[0] === word[0].toUpperCase())
+    .filter((dept) => PREDEFINED_DEPARTMENTS.includes(dept));
 
   // If we still couldn't find any departments, return a subset of predefined departments
   if (potentialDepartments.length === 0) {
