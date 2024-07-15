@@ -59,17 +59,17 @@ const Chat: React.FC = () => {
     <Flex
       className="rounded-2xl items-end border-2 border-gray-400 shadow-xl"
       bg="#F5F5F5"
-      height={{ base: "90%", "2xl": "95%" }}
-      justify="flex-end"
+      height={{ base: "85%", "2xl": "95%" }}
+      // justify="flex-end"
       direction="column"
       p={2}
     >
       <Flex
-        height="95%"
+        height="97%"
         width="100%"
         direction="column"
         overflowY="auto"
-        p={2}
+        // p={2}
         mb={2}
       >
         <MessageList messages={messages} />
