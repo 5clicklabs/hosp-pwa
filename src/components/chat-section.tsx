@@ -57,7 +57,7 @@ const Chat: React.FC = () => {
 
   return (
     <Flex
-      className="rounded-2xl items-end border-2 border-gray-400 shadow-xl"
+      className="rounded-2xl items-end border-2 border-gray-300 shadow-xl"
       bg="#F5F5F5"
       height={{ base: "85%", "2xl": "95%" }}
       // justify="flex-end"

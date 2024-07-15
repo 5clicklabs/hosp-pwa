@@ -22,6 +22,26 @@ export default function AppointmentForm({
   userDetails,
   handleUserDetailsSubmit,
 }: AppointmentFormProps) {
+  const [errors, setErrors] = React.useState({ phone: "" });
+
+  const validatePhoneNumber = (phone: string) => {
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      setErrors({ ...errors, phone: "Phone number must be 10 digits long" });
+    } else {
+      setErrors({ ...errors, phone: "" });
+    }
+  };
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    handleUserDetailsChange(e);
+
+    if (name === "phone") {
+      validatePhoneNumber(value);
+    }
+  }
+
   return (
     <>
       <Box bg="white" p={4} borderRadius="md" shadow="md" mt={4}>
@@ -67,10 +87,15 @@ export default function AppointmentForm({
                 placeholder="Phone Number"
                 type="tel"
                 value={userDetails.phone}
-                onChange={handleUserDetailsChange}
+                onChange={handleInputChange}
                 required
               />
             </InputGroup>
+            {errors.phone && (
+              <CText color="red.500" fontSize="sm">
+                {errors.phone}
+              </CText>
+            )}
           </Flex>
 
           <Flex width="100%" direction="column">
@@ -86,7 +111,11 @@ export default function AppointmentForm({
               onChange={handleUserDetailsChange}
             />
           </Flex>
-          <Button onClick={handleUserDetailsSubmit} className="w-full">
+          <Button
+            disabled={!!errors.phone}
+            onClick={handleUserDetailsSubmit}
+            className="w-full"
+          >
             <CText>Submit Details</CText>
           </Button>
         </VStack>

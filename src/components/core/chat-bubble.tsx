@@ -19,6 +19,8 @@ export default function ChatBubble({
     return text.replace(/\n/g, "<br />");
   };
 
+  const fontSize = useFS.fontSize;
+
   return (
     <div
       className={`relative flex items-center ${
@@ -37,9 +39,7 @@ export default function ChatBubble({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <p
-          className={`px-3 py-2 text-[${useFS.fontSize}px] leading-[${useFS.fontSize}px]`}
-        >
+        <p className={`px-3 py-2 text-[${fontSize}px] leading-[${fontSize}px]`}>
           {sender === "system" ? (
             <Spinner size="sm" />
           ) : (

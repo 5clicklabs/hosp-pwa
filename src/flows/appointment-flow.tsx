@@ -223,7 +223,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
           timestamp: new Date().toLocaleString(),
         });
         onFlowComplete();
-      }, 5000);
+      }, 3000);
     } catch (error: any) {
       console.error("Failed to book appointment:", error);
       toast.error("Failed to book appointment. Please try again.");
@@ -273,7 +273,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
           onBackToDoctors={() => {
             addMessage({
               id: Date.now(),
-              text: `I'd like to change my doctor.`,
+              text: `I'd like to change my doctor`,
               sender: "user",
               timestamp: new Date().toLocaleString(),
             });
@@ -282,9 +282,26 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
         />
       )}
       {step === "confirmation" && (
-        <Button onClick={handleConfirmAppointment} className="w-full">
-          {isBooking ? <Spinner size="sm" /> : "Confirm Appointment"}
-        </Button>
+        <Flex>
+          <Button onClick={handleConfirmAppointment} className="w-1/2">
+            {isBooking ? <Spinner size="sm" /> : "Confirm Appointment"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              addMessage({
+                id: Date.now(),
+                text: `I'd like to change my appointment slot`,
+                sender: "user",
+                timestamp: new Date().toLocaleString(),
+              });
+              setStep("calendar");
+            }}
+            className="w-1/2"
+          >
+            Choose a different slot
+          </Button>
+        </Flex>
       )}
     </Flex>
   );

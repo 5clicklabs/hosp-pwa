@@ -73,17 +73,24 @@ function Settings({ isOpen, onClose }: SettingsProps) {
 
   return (
     <>
-      <Modal isCentered isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent width="90%">
+      <Modal
+        isCentered
+        isOpen={isOpen}
+        onClose={onClose}
+        motionPreset="slideInBottom"
+      >
+        <ModalOverlay bg="#ffffff80" />
+        <ModalContent width="90%" bg="#322c2cf2" borderRadius={16}>
           <ModalHeader>
-            <CText align="center">Settings</CText>
+            <CText align="center" color="white">
+              Settings
+            </CText>
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton color="white" />
           <ModalBody className="space-y-3">
             <Flex align="center" className="space-x-3">
-              <Languages className="h-6 w-6" />
-              <CText>Toggle Language:</CText>
+              <Languages className="h-6 w-6 text-white" />
+              <CText color="white">Toggle Language:</CText>
               <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                   {language.applicationLanguage}
@@ -108,8 +115,8 @@ function Settings({ isOpen, onClose }: SettingsProps) {
 
             <Flex align="center" className="space-x-3">
               <Flex align="center" className="space-x-3">
-                <FontSizeIcon className="h-6 w-6" />
-                <CText>Change Font Size:</CText>
+                <FontSizeIcon className="h-6 w-6 text-white" />
+                <CText color="white">Change Font Size:</CText>
               </Flex>
 
               <Flex align="center" justify="space-evenly" className="space-x-4">
@@ -117,7 +124,7 @@ function Settings({ isOpen, onClose }: SettingsProps) {
                   <Minus className="h-6 w-6" />
                 </BlackButton>
 
-                <CText>{fontSize.fontSize}</CText>
+                <CText color="white">{fontSize.fontSize}</CText>
 
                 <BlackButton size={"sm"} onClick={increaseFontSize}>
                   <Plus className="h-6 w-6" />
