@@ -25,7 +25,7 @@ const OpenAIStatus: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex items-center space-x-2 font-mono">
+    <div className="w-full flex items-center space-x-2 font-mono">
       {status === "checking" && (
         <>
           <div className="h-4 w-4 bg-yellow-500 rounded-full animate-ping"></div>

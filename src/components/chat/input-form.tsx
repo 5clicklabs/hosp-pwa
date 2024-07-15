@@ -6,9 +6,14 @@ import { toast } from "sonner";
 interface InputFormProps {
   onSubmit: (message: string) => void;
   isFetching: boolean;
+  placeholder?: string;
 }
 
-const InputForm: React.FC<InputFormProps> = ({ onSubmit, isFetching }) => {
+const InputForm: React.FC<InputFormProps> = ({
+  onSubmit,
+  isFetching,
+  placeholder,
+}) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -63,7 +68,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isFetching }) => {
       >
         <Textarea
           ref={textareaRef}
-          placeholder="Describe your symptoms..."
+          placeholder={placeholder ? placeholder : "Describe your symptoms..."}
           _placeholder={{
             color: "gray.400",
             fontSize: "14px",

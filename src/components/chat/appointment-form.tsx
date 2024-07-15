@@ -6,6 +6,7 @@ import {
   InputGroup,
   InputLeftAddon,
   VStack,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
 import CText from "../core/ctext";
@@ -15,12 +16,14 @@ interface AppointmentFormProps {
   userDetails: UserDetails;
   handleUserDetailsChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleUserDetailsSubmit: () => void;
+  isFetching: boolean;
 }
 
 export default function AppointmentForm({
   handleUserDetailsChange,
   userDetails,
   handleUserDetailsSubmit,
+  isFetching,
 }: AppointmentFormProps) {
   const [errors, setErrors] = React.useState({ phone: "" });
 
@@ -116,7 +119,7 @@ export default function AppointmentForm({
             onClick={handleUserDetailsSubmit}
             className="w-full"
           >
-            <CText>Submit Details</CText>
+            {isFetching ? <Spinner size="sm" /> : <CText>Submit Details</CText>}
           </Button>
         </VStack>
       </Box>

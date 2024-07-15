@@ -1,5 +1,4 @@
 import menuAtom from "@/atoms/menuAtom";
-import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import { FrequentlyUsedCard } from "@/lib/types";
 import {
   Drawer,
@@ -14,6 +13,8 @@ import React from "react";
 import { useRecoilState } from "recoil";
 import CText from "./core/ctext";
 import OpenAIStatus from "./status";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase.config";
 
 export default function HamburgerMenu() {
   const [menuIsOpen, setMenuIsOpen] = useRecoilState(menuAtom);
@@ -22,7 +23,7 @@ export default function HamburgerMenu() {
     setMenuIsOpen({ isOpen: false });
   };
 
-  const { options } = useFrequentlyAskedOperations();
+  const [user] = useAuthState(auth);
 
   return (
     <>
@@ -31,23 +32,26 @@ export default function HamburgerMenu() {
         <DrawerContent>
           <DrawerCloseButton />
 
-          <DrawerBody p={10}>
-            {/* <CText
-              textAlign="left"
-              fontSize={{ base: "16px", lg: "18px" }}
-              fontWeight="bold"
-              mb={3}
-            >
-              Most Frequently Asked
-            </CText>
-            <Stack spacing={2}>
-              {options.map((item, index) => (
-                <Row key={index} {...item} />
-              ))}
-            </Stack> */}
+          <DrawerBody mt={12}>
+            <Flex height="100%" width="100%"></Flex>
           </DrawerBody>
 
-          <DrawerFooter className="w-full">
+          <DrawerFooter
+            className="w-full"
+            display="flex"
+            flexDirection={"column"}
+          >
+            {user ? (
+              <div className="flex w-full items-center space-x-2 font-mono">
+                <div className="h-4 w-4 bg-green-500 rounded-full "></div>
+                <CText>Logged in as: {user.phoneNumber}</CText>
+              </div>
+            ) : (
+              <div className="flex w-full items-center space-x-2 font-mono">
+                <div className="h-4 w-4 bg-yellow-500 rounded-full"></div>
+                <CText>Not logged in</CText>
+              </div>
+            )}
             <OpenAIStatus />
           </DrawerFooter>
         </DrawerContent>

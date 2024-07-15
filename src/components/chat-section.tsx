@@ -5,6 +5,7 @@ import MessageList from "./chat/message-list";
 import WelcomeOptions from "./chat/welcome-options";
 import useFrequentlyAskedOperations from "@/hooks/frequent-ops";
 import AppointmentFlow from "@/flows/appointment-flow";
+import GeneralInquiryFlow from "@/flows/general-inquiry";
 
 const Chat: React.FC = () => {
   const { sendMessageToGPT, messages, setMessages } =
@@ -44,10 +45,8 @@ const Chat: React.FC = () => {
       setCurrentFlow("appointment");
     } else if (option === "Get Lab Reports") {
       setCurrentFlow("labReports");
-      // Implement lab reports flow
     } else if (option === "General Inquiry") {
       setCurrentFlow("generalInquiry");
-      // Implement general inquiry flow
     }
   };
 
@@ -84,6 +83,16 @@ const Chat: React.FC = () => {
             }}
           />
         )}
+        {/* {currentFlow === "generalInquiry" && (
+          <GeneralInquiryFlow
+            addMessage={addMessage}
+            onFlowComplete={() => {
+              setCurrentFlow("none");
+              setShowOptions(true);
+            }}
+            sendMessageToGPT={sendMessageToGPT}
+          />
+        )} */}
         <div ref={messagesEndRef} />
       </Flex>
     </Flex>

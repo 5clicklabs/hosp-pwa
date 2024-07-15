@@ -2,12 +2,20 @@ import { AppointmentCalendar } from "@/components/chat/appointment-calendar";
 import AppointmentForm from "@/components/chat/appointment-form";
 import DoctorSelection from "@/components/chat/doctor-selection";
 import InputForm from "@/components/chat/input-form";
+import { OTPVerification } from "@/components/core/otp-verification";
 import { Button } from "@/components/ui/button";
 import useOperations from "@/hooks/operations";
 import { MANIPAL_DOCTORS } from "@/lib/doctors";
+import { auth } from "@/lib/firebase.config";
 import { downloadICSFile } from "@/lib/utils";
 import { Flex, Spinner, VStack } from "@chakra-ui/react";
+import {
+  PhoneAuthProvider,
+  RecaptchaVerifier,
+  signInWithCredential,
+} from "firebase/auth";
 import React, { useEffect, useRef, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "sonner";
 import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
 
@@ -24,24 +32,13 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   sendMessageToGPT,
   onFlowComplete,
 }) => {
-  const initialMessageSent = useRef(false);
-  useEffect(() => {
-    if (!initialMessageSent.current) {
-      addMessage({
-        id: Date.now(),
-        text: "What can we help you with?",
-        sender: "assistant",
-        timestamp: new Date().toLocaleString(),
-      });
-      setStep("input");
-      initialMessageSent.current = true;
-    }
-  }, [addMessage]);
+  const [user] = useAuthState(auth);
 
   const [step, setStep] = useState<
     | "input"
     | "departments"
     | "userDetails"
+    | "otpverification"
     | "doctorSelection"
     | "calendar"
     | "confirmation"
@@ -59,8 +56,54 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
+  const [otp, setOTP] = useState("");
+  const [verificationId, setVerificationId] = useState<string | null>(null);
 
   const { bookAppointment, isBooking } = useOperations();
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const initialMessageSent = useRef(false);
+
+  useEffect(() => {
+    if (!initialMessageSent.current) {
+      addMessage({
+        id: Date.now(),
+        text: "What can we help you with?",
+        sender: "assistant",
+        timestamp: new Date().toLocaleString(),
+      });
+      setStep("input");
+      initialMessageSent.current = true;
+    }
+  }, [addMessage]);
+
+  useEffect(() => {
+    if (!recaptchaVerifierRef.current) {
+      try {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+            callback: () => {
+              console.log("reCAPTCHA verified");
+            },
+            "expired-callback": () => {
+              console.log("reCAPTCHA expired");
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error initializing RecaptchaVerifier:", error);
+      }
+    }
+
+    return () => {
+      if (recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current.clear();
+        recaptchaVerifierRef.current = null;
+      }
+    };
+  }, []);
 
   const handleSubmit = async (message: string) => {
     setIsFetching(true);
@@ -119,7 +162,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
     setStep("userDetails");
   };
 
-  const handleUserDetailsSubmit = (details: UserDetails) => {
+  const handleUserDetailsSubmit = async (details: UserDetails) => {
     setUserDetails(details);
     addMessage({
       id: Date.now(),
@@ -128,6 +171,56 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
       timestamp: new Date().toLocaleString(),
     });
 
+    if (!user) {
+      setIsFetching(true);
+      try {
+        const phoneProvider = new PhoneAuthProvider(auth);
+
+        const verificationId = await phoneProvider.verifyPhoneNumber(
+          `+91${details.phone}`,
+          recaptchaVerifierRef.current!
+        );
+
+        setVerificationId(verificationId);
+        addMessage({
+          id: Date.now(),
+          text: `Please verify your phone number to proceed.`,
+          sender: "assistant",
+          timestamp: new Date().toLocaleString(),
+        });
+        setStep("otpverification");
+      } catch (error) {
+        toast.error("Failed to send verification code. Please try again.");
+      } finally {
+        setIsFetching(false);
+      }
+    } else {
+      proceedToDoctorSelection();
+    }
+  };
+
+  const onChangeOTP = (pin: string) => {
+    setOTP(pin);
+  };
+
+  const verifyOTP = async () => {
+    if (verificationId && otp) {
+      setIsFetching(true);
+      try {
+        const credential = PhoneAuthProvider.credential(verificationId, otp);
+        await signInWithCredential(auth, credential);
+        toast.success("Phone number verified successfully!");
+        proceedToDoctorSelection();
+      } catch (error) {
+        console.error("Error during OTP verification:", error);
+        toast.error("Invalid OTP. Please try again.");
+      } finally {
+        setIsFetching(false);
+      }
+    }
+  };
+
+  const proceedToDoctorSelection = () => {
     const departmentDoctors = MANIPAL_DOCTORS.filter(
       (doctor) => doctor.department === selectedDepartment
     );
@@ -257,6 +350,15 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
             setUserDetails({ ...userDetails, [e.target.name]: e.target.value })
           }
           handleUserDetailsSubmit={() => handleUserDetailsSubmit(userDetails)}
+          isFetching={isFetching}
+        />
+      )}
+      {step === "otpverification" && (
+        <OTPVerification
+          onChangeOTP={onChangeOTP}
+          otp={otp}
+          onVerifyOTP={verifyOTP}
+          isFetching={isFetching}
         />
       )}
       {step === "doctorSelection" && (
@@ -303,6 +405,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
           </Button>
         </Flex>
       )}
+      <div id="recaptcha-container" style={{ display: "none" }}></div>
     </Flex>
   );
 };
