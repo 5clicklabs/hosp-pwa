@@ -8,7 +8,7 @@ import useOperations from "@/hooks/operations";
 import { MANIPAL_DOCTORS } from "@/lib/doctors";
 import { auth } from "@/lib/firebase.config";
 import { downloadICSFile } from "@/lib/utils";
-import { Flex, Spinner, VStack } from "@chakra-ui/react";
+import { Flex, HStack, Spinner, VStack } from "@chakra-ui/react";
 import {
   PhoneAuthProvider,
   RecaptchaVerifier,
@@ -18,6 +18,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "sonner";
 import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
+import DepartmentSelectionModal from "@/components/chat/department-modal";
 
 interface AppointmentFlowProps {
   addMessage: (message: Message) => void;
@@ -45,6 +46,9 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   >("input");
   const [departments, setDepartments] = useState<string[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDepartmentFromModal, setSelectedDepartmentFromModal] =
+    useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "",
     email: "",
@@ -160,6 +164,10 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
       timestamp: new Date().toLocaleString(),
     });
     setStep("userDetails");
+  };
+
+  const handleOtherDepartmentSelect = (department: string) => {
+    setSelectedDepartmentFromModal(department);
   };
 
   const handleUserDetailsSubmit = async (details: UserDetails) => {
@@ -341,6 +349,29 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
               Proceed with {dept}
             </Button>
           ))}
+          {selectedDepartmentFromModal ? (
+            <VStack spacing={2} mt={2}>
+              <Button
+                className="w-full"
+                onClick={() =>
+                  handleDepartmentSelect(selectedDepartmentFromModal)
+                }
+              >
+                Proceed with {selectedDepartmentFromModal}
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Choose another department
+              </Button>
+            </VStack>
+          ) : (
+            <Button className="w-full" onClick={() => setIsModalOpen(true)}>
+              Proceed with any other department
+            </Button>
+          )}
         </VStack>
       )}
       {step === "userDetails" && (
@@ -405,6 +436,12 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
           </Button>
         </Flex>
       )}
+
+      <DepartmentSelectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleOtherDepartmentSelect}
+      />
       <div id="recaptcha-container" style={{ display: "none" }}></div>
     </Flex>
   );

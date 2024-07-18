@@ -52,7 +52,7 @@ export default function HamburgerMenu() {
                 <CText>Not logged in</CText>
               </div>
             )}
-            <OpenAIStatus />
+            {/* <OpenAIStatus /> */}
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
