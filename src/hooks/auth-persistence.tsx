@@ -6,9 +6,9 @@ export default function useAuthPersistence() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User is signed in:", user);
+        // console.log("User is signed in:", user);
       } else {
-        console.log("User is signed out");
+        console.log("User is not logged in");
       }
     });
 

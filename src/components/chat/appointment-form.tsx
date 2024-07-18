@@ -5,8 +5,8 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
-  VStack,
   Spinner,
+  VStack,
 } from "@chakra-ui/react";
 import React from "react";
 import CText from "../core/ctext";

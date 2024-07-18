@@ -1,5 +1,6 @@
 import { AppointmentCalendar } from "@/components/chat/appointment-calendar";
 import AppointmentForm from "@/components/chat/appointment-form";
+import DepartmentSelectionModal from "@/components/chat/department-modal";
 import DoctorSelection from "@/components/chat/doctor-selection";
 import InputForm from "@/components/chat/input-form";
 import { OTPVerification } from "@/components/core/otp-verification";
@@ -8,7 +9,7 @@ import useOperations from "@/hooks/operations";
 import { MANIPAL_DOCTORS } from "@/lib/doctors";
 import { auth } from "@/lib/firebase.config";
 import { downloadICSFile } from "@/lib/utils";
-import { Flex, HStack, Spinner, VStack } from "@chakra-ui/react";
+import { Flex, Spinner, VStack } from "@chakra-ui/react";
 import {
   PhoneAuthProvider,
   RecaptchaVerifier,
@@ -18,7 +19,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { toast } from "sonner";
 import { AppointmentData, Doctor, Message, UserDetails } from "../lib/types";
-import DepartmentSelectionModal from "@/components/chat/department-modal";
 
 interface AppointmentFlowProps {
   addMessage: (message: Message) => void;
@@ -34,6 +34,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   onFlowComplete,
 }) => {
   const [user] = useAuthState(auth);
+  const flowContainerRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<
     | "input"
@@ -66,6 +67,18 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   const { bookAppointment, isBooking } = useOperations();
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const initialMessageSent = useRef(false);
+
+  const scrollToBottom = () => {
+    if (flowContainerRef.current) {
+      const scrollHeight = flowContainerRef.current.scrollHeight;
+      const height = flowContainerRef.current.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      flowContainerRef.current.scrollTo({
+        top: maxScrollTop,
+        behavior: "smooth",
+      });
+    }
+  };
 
   useEffect(() => {
     if (!initialMessageSent.current) {
@@ -108,6 +121,19 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [step]);
+
+  useEffect(() => {
+    if (user) {
+      setUserDetails({
+        ...userDetails,
+        phone: user.phoneNumber?.split("+91")[1] || "",
+      });
+    }
+  }, [user]);
 
   const handleSubmit = async (message: string) => {
     setIsFetching(true);
@@ -332,7 +358,7 @@ const AppointmentFlow: React.FC<AppointmentFlowProps> = ({
   };
 
   return (
-    <Flex direction="column" gap={4}>
+    <Flex direction="column" gap={4} ref={flowContainerRef}>
       {step === "input" && (
         <Flex mt={2}>
           <InputForm onSubmit={handleSubmit} isFetching={isFetching} />
