@@ -1,60 +1,110 @@
-I created this boilerplate for a Progressive Web Application that uses Next.js framework because many of the tutorials I found online left out important information about options in the `_document.tsx`, `mainfest.json`, and the `next.config.js` files. [This youtube tutorial](https://www.youtube.com/watch?v=ARNN_zmrwcw) had the most up-to-date information at the time, and the comments below were my best resources for creating a PWA with [`next-pwa`](https://www.npmjs.com/package/next-pwa) library and nextjs. Hope this is helpful!
+# Hospital Appointment Booking System with Chat Interface
 
-## To Set Up Your Own Progressive Web App with Next.js
+A modern Progressive Web Application (PWA) built with Next.js that provides an intuitive chat-based interface for booking hospital appointments. The application uses OpenAI's GPT API for natural language processing and Firebase for data persistence.
 
-Fork this repo, clone to your machine, and when in the root folder, run `npm install`.
+## Features
 
-If you want to immediately compile and view the boilerplate app on your machine, run:
-- `npx next build`
-followed by
-- `npx next start`
-- navigate to `localhost:3000` in your chrome browser (or any browser run with chromium), and view the app. 
+- 💬 Chat-like interface for natural interaction
+- 🏥 Intelligent department recommendation based on symptoms
+- 📅 Real-time appointment scheduling
+- 📱 Progressive Web App (PWA) support
+- 📞 Phone number verification with OTP
+- 📆 Calendar integration for appointments
+- 🌐 Multi-language support
+- 🔒 Secure authentication with Firebase
 
-To import as a desktop app, click the icon seen here: 
+## Prerequisites
 
-<img width="510" alt="image" src="https://user-images.githubusercontent.com/99047250/213308384-370d7664-2f28-48de-a64a-dd896c8ad528.png">
+Before you begin, ensure you have:
 
-To customize, edit the provided `manifest.json` file in the `public` folder, and run through the workflow above. Be sure to have the `display` option set to "standalone" or "fullscreen". 
+1. **Firebase Account & Configuration**
 
-Please feel free to leave feedback, comments, or links to issues so that this boilerplate can be kept up-to-date.
+   - Create a Firebase project
+   - Enable Authentication (Phone Authentication)
+   - Enable Firestore Database
+   - Create a web app and get your configuration
+   - Add the following to your `.env.local`:
 
+   ```
+   NEXT_PUBLIC_API_KEY=your_firebase_api_key
+   NEXT_PUBLIC_AUTH_DOMAIN=your_firebase_auth_domain
+   NEXT_PUBLIC_PROJECT_ID=your_firebase_project_id
+   NEXT_PUBLIC_STORAGE_BUCKET=your_firebase_storage_bucket
+   NEXT_PUBLIC_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   NEXT_PUBLIC_APP_ID=your_firebase_app_id
+   ```
 
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+2. **OpenAI API Key**
+   - Get an API key from OpenAI
+   - Add to `.env.local`:
+   ```
+   OPENAI_API_KEY=your_openai_api_key
+   ```
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) with your browser
+
+## Building for Production
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## PWA Support
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+This project was built on top of a Next.js PWA boilerplate created by [this youtube tutorial](https://www.youtube.com/watch?v=ARNN_zmrwcw). The original boilerplate provided essential configurations for PWA support including:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- Proper `_document.tsx` setup
+- Configured `manifest.json`
+- Optimized `next.config.js`
+- PWA installation support
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+To customize the PWA settings, edit the `manifest.json` file in the `public` folder. Ensure the `display` option is set to "standalone" or "fullscreen".
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+To install as a desktop app, look for the install icon in your browser's address bar:
+
+<img width="510" alt="PWA Install Button" src="https://user-images.githubusercontent.com/99047250/213308384-370d7664-2f28-48de-a64a-dd896c8ad528.png">
+
+## Project Structure
+
+- `/src/components`: UI components including chat interface
+- `/src/flows`: Flow logic for different features
+- `/src/hooks`: Custom hooks for operations and frequent tasks
+- `/src/lib`: Types, utilities, and configurations
+- `/src/pages`: Next.js pages and API routes
+
+## Key Features Implementation
+
+The appointment booking flow is implemented in a modular way, with separate components for:
+
+- Department selection
+- User details collection
+- OTP verification
+- Doctor selection
+- Appointment scheduling
+- Confirmation and calendar integration
+
+## Credits
+
+PWA boilerplate template created by [original author]. The original template provided crucial configurations for PWA functionality with Next.js, which many online tutorials missed.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [OpenAI API Documentation](https://platform.openai.com/docs)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+MIT

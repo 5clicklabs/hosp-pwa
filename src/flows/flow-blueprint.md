@@ -1,152 +1,143 @@
-1. Identify the Flow:
+Certainly! Here's a revised blueprint for creating a similar flow, based on the modular structure we've implemented:
 
-   - Determine the purpose and steps of the new flow (e.g., lab report retrieval, general inquiry).
-   - List out all the stages the user will go through.
-
-2. Create a New Flow Component:
-
-   - Create a new file (e.g., `LabReportFlow.tsx` or `GeneralInquiryFlow.tsx`).
-   - Set up the basic structure of a functional component.
-
-3. Define State:
-
-   - Use `useState` hooks for each piece of information you need to track.
-   - Common states might include:
-     ```typescript
-     const [step, setStep] = useState<string>("initial");
-     const [userInput, setUserInput] = useState<string>("");
-     const [flowSpecificData, setFlowSpecificData] = useState<any>(null);
-     ```
-
-4. Create Step Functions:
-
-   - For each step in your flow, create a function to handle that step.
-   - Example:
-
-     ```typescript
-     const handleInitialStep = () => {
-       // Logic for the first step
-       setStep("next_step");
-     };
-
-     const handleNextStep = (input: string) => {
-       // Process input and move to next step
-       setFlowSpecificData(processInput(input));
-       setStep("final_step");
-     };
-     ```
-
-5. Implement AI Interaction:
-
-   - If your flow requires AI interaction, use the `sendMessageToGPT` function from your hook.
-   - Process the AI's response and update the flow accordingly.
-
-6. Create UI Components:
-
-   - For each step, create the necessary UI components.
-   - These could be input forms, buttons, or displays of information.
-
-7. Main Render Function:
-
-   - Use a switch statement or conditional rendering to display the correct component for each step.
-   - Example:
-     ```typescript
-     return (
-       <div>
-         {step === "initial" && (
-           <InitialStepComponent onNext={handleInitialStep} />
-         )}
-         {step === "next_step" && (
-           <NextStepComponent onSubmit={handleNextStep} />
-         )}
-         {step === "final_step" && (
-           <FinalStepComponent data={flowSpecificData} />
-         )}
-       </div>
-     );
-     ```
-
-8. Error Handling:
-
-   - Implement try-catch blocks for async operations.
-   - Use toast or other notification methods for user feedback.
-
-9. Completion Logic:
-
-   - Implement logic to determine when the flow is complete.
-   - Call a completion function passed as a prop to return control to the main Chat component.
-
-10. Integration with Main Chat:
-    - In your main Chat component, conditionally render your new flow component when it's selected.
-    - Pass necessary props like `addMessage` and `onFlowComplete`.
-
-Here's a basic template you can use for new flows:
+1. Define the Flow Logic (e.g., `newFlowLogic.ts`):
 
 ```typescript
-import React, { useState } from "react";
-import { useFrequentlyAskedOperations } from "@/hooks/frequent-ops";
+import { useState, useEffect } from "react";
+import { Message } from "../lib/types";
 
-interface NewFlowProps {
-  addMessage: (message: Message) => void;
-  onFlowComplete: () => void;
-}
+export const useNewFlow = (
+  addMessage: (message: Message) => void,
+  sendMessageToGPT: (
+    message: string
+  ) => Promise<{ response: string; someData: any }>,
+  onFlowComplete: () => void
+) => {
+  // Define states
+  const [step, setStep] = useState<"step1" | "step2" | "step3">("step1");
+  const [someData, setSomeData] = useState<any>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
-const NewFlow: React.FC<NewFlowProps> = ({ addMessage, onFlowComplete }) => {
-  const [step, setStep] = useState<string>("initial");
-  const [flowData, setFlowData] = useState<any>(null);
-  const { sendMessageToGPT } = useFrequentlyAskedOperations();
-
-  const handleInitialStep = async (input: string) => {
+  // Define handlers
+  const handleStep1 = async (input: string) => {
+    setIsFetching(true);
     try {
-      const { response } = await sendMessageToGPT(input);
-      addMessage({
-        id: Date.now(),
-        text: response,
-        sender: "assistant",
-        timestamp: new Date().toLocaleString(),
-      });
-      setFlowData(processResponse(response));
-      setStep("next_step");
+      const response = await sendMessageToGPT(input);
+      // Process response
+      setStep("step2");
     } catch (error) {
-      console.error("Error in initial step:", error);
-      // Handle error
+      console.error(error);
+    } finally {
+      setIsFetching(false);
     }
   };
 
-  const handleNextStep = (input: string) => {
-    // Process input and update flow
-    setStep("final_step");
+  const handleStep2 = (data: any) => {
+    setSomeData(data);
+    setStep("step3");
   };
 
-  const handleCompletion = () => {
-    // Perform any final actions
+  const handleStep3 = () => {
+    // Final step logic
     onFlowComplete();
   };
 
+  // Return states and handlers
+  return {
+    step,
+    someData,
+    isFetching,
+    handleStep1,
+    handleStep2,
+    handleStep3,
+  };
+};
+```
+
+2. Create the Flow Component (e.g., `NewFlow.tsx`):
+
+```typescript
+import React from "react";
+import { Flex, Button } from "@chakra-ui/react";
+import { useNewFlow } from "./newFlowLogic";
+import Step1Component from "./Step1Component";
+import Step2Component from "./Step2Component";
+import Step3Component from "./Step3Component";
+
+interface NewFlowProps {
+  addMessage: (message: Message) => void;
+  sendMessageToGPT: (
+    message: string
+  ) => Promise<{ response: string; someData: any }>;
+  onFlowComplete: () => void;
+}
+
+const NewFlow: React.FC<NewFlowProps> = ({
+  addMessage,
+  sendMessageToGPT,
+  onFlowComplete,
+}) => {
+  const { step, someData, isFetching, handleStep1, handleStep2, handleStep3 } =
+    useNewFlow(addMessage, sendMessageToGPT, onFlowComplete);
+
   return (
-    <div>
-      {step === "initial" && (
-        <InitialStepComponent onSubmit={handleInitialStep} />
+    <Flex direction="column" gap={4}>
+      {step === "step1" && (
+        <Step1Component onSubmit={handleStep1} isFetching={isFetching} />
       )}
-      {step === "next_step" && (
-        <NextStepComponent data={flowData} onNext={handleNextStep} />
+      {step === "step2" && (
+        <Step2Component onSubmit={handleStep2} data={someData} />
       )}
-      {step === "final_step" && (
-        <FinalStepComponent onComplete={handleCompletion} />
-      )}
-    </div>
+      {step === "step3" && <Step3Component onComplete={handleStep3} />}
+    </Flex>
   );
 };
 
 export default NewFlow;
 ```
 
-When implementing a new flow:
+3. Blueprint for creating a new flow:
 
-1. Copy this template and rename it appropriately.
-2. Modify the steps and logic to fit the specific flow requirements.
-3. Create the necessary UI components for each step.
-4. Implement the required logic for processing user inputs and AI responses.
-5. Ensure proper error handling and user feedback throughout the flow.
+   a. Define the flow steps and required data:
 
-This approach should give you a solid foundation for creating new flows in your chat application, maintaining consistency and modularity across different features.
+   - Identify the main steps of your flow
+   - Determine what data needs to be collected or processed at each step
+
+   b. Create the flow logic file (e.g., `newFlowLogic.ts`):
+
+   - Define state variables for each piece of data and the current step
+   - Create handler functions for each step
+   - Implement any necessary API calls or data processing
+   - Return all relevant state and handler functions
+
+   c. Create the flow component file (e.g., `NewFlow.tsx`):
+
+   - Import and use the custom hook from the logic file
+   - Create a component for each step of the flow
+   - Render the appropriate component based on the current step
+   - Pass necessary props to each step component
+
+   d. Create individual step components:
+
+   - Implement the UI for each step
+   - Use props passed from the main flow component
+   - Call the appropriate handler function when the step is complete
+
+   e. Integrate the new flow into your main application:
+
+   - Import the new flow component where needed
+   - Provide necessary props (addMessage, sendMessageToGPT, onFlowComplete)
+
+   f. Test the flow:
+
+   - Ensure each step works as expected
+   - Test error scenarios and edge cases
+   - Verify that data is correctly passed between steps
+
+   g. Refine and optimize:
+
+   - Look for opportunities to reuse components or logic
+   - Optimize performance if necessary
+   - Ensure the UI is responsive and accessible
+
+By following this blueprint, you can create modular, maintainable flows for different features in your application. This structure separates concerns, making it easier to understand, test, and modify each part of the flow independently.
